@@ -20,8 +20,9 @@ downloaded_drive_assets/
 # AI Tooling & external skills
 skills/
 skills-lock.json
-agent/
-data/
+/agent/
+/data/
+!src/data/
 .agents/
 .adal/
 .aider-desk/

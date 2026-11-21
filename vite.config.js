@@ -7,7 +7,15 @@ export default defineConfig({
   server: {
     port: 3000,
     open: false,
-    allowedHosts: true
+    allowedHosts: [
+      'thekesari.com',
+      '.thekesari.com',
+      'www.thekesari.com',
+      'concise-tan-mallard-10.hostingersite.com',
+      '.hostingersite.com',
+      'localhost',
+      '127.0.0.1'
+    ]
   },
   build: {
     chunkSizeWarningLimit: 600,

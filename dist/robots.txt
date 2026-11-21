@@ -31,4 +31,5 @@ Allow: /
 User-agent: CCBot
 Allow: /
 
+Sitemap: https://thekesari.com/sitemap.xml
 Sitemap: https://kesaristudio.com/sitemap.xml
