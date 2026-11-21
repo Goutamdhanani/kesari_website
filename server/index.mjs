@@ -26,7 +26,7 @@ const network=(host==='0.0.0.0'||host==='::')?lanUrls(port):[];
 if(network[0])await writeNetworkQr(network[0],root);
 if(network[0])app.get('/network-qr.png',(req,res)=>{res.setHeader('Cache-Control','no-store');res.sendFile(path.join(root,'public/network-qr.png'));});
 const server=createHttpServer(app);let vite;
-if(process.argv.includes('--production')){
+if(process.argv.includes('--production') || process.env.NODE_ENV === 'production'){
   app.use(express.static(path.join(root,'dist'),{index:false}));
   app.get('/{*page}',(req,res)=>{
     const raw=readFileSync(path.join(root,'dist/index.html'),'utf8');
