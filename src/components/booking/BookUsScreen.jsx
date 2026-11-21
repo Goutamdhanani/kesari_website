@@ -43,7 +43,7 @@ export const KESARI_HALLS = [
     description: 'Our crown jewel acoustic auditorium engineered with high ceilings, acoustic wood diffusers, modular stage risers, and professional line array sound. Perfect for amplified live bands, standup specials, launch events, and full-scale cultural evenings.',
     images: [
       '/assets/kesari-hall.webp',
-      '/assets/events/kesari_stage_inside.jpg',
+      '/assets/venue/kesari_main_stage_live.png',
       '/assets/events/hall.webp'
     ],
     highlights: [

@@ -26,7 +26,7 @@ export const STUDIO_HALLS = [
     guestCount: 200,
     price: 'From ₹15,000',
     priceVal: 15000,
-    image: '/assets/events/kesari_stage_inside.jpg',
+    image: '/assets/venue/kesari_main_stage_live.png',
     idealFor: 'Concerts, indie gigs, album launches & large gatherings',
     features: ['Line Array PA Rig', 'DMX Stage Lighting', 'Artist Green Room', 'Sound Engineer on Duty'],
     bookingUrl: '/book?hall=main-stage'

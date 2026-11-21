@@ -413,9 +413,9 @@ Please share artist availability and technical rider!`;
               type="button"
               className="reset-filters-btn"
               style={{ background: '#DAFB71', color: '#08080A', fontWeight: 800, marginTop: '12px' }}
-              onClick={handleRegisterClick}
+              onClick={handleGoToRegister}
             >
-              <Mic size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
+              <Mic2 size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
               Register as an Artist
             </button>
           </div>

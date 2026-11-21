@@ -25,8 +25,8 @@ export const VENUE_PHOTOS = [
     id: 'v3',
     area: 'stage',
     areaLabel: 'Main Stage',
-    title: 'Main Stage Sound Rig & Lights',
-    image: '/assets/events/kesari_stage_inside.jpg'
+    title: 'Main Stage Sound Rig & Acoustic Chamber',
+    image: '/assets/venue/kesari_main_stage_live.png'
   },
   {
     id: 'v4',

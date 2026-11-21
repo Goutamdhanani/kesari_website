@@ -91,7 +91,7 @@ const ROUTE_SEO_CONFIG = {
     title: 'Host an Event & Concert Hall Rental | Koramangala, Bangalore | Kesari',
     description: 'Rent acoustically treated studio halls for concerts, jams, comedy, workshops, and private listening sessions. Capacities up to 200 guests with on-site sound engineer.',
     canonical: 'https://kesaristudio.com/host-event',
-    ogImage: '/assets/events/kesari_stage_inside.jpg',
+    ogImage: '/assets/venue/kesari_main_stage_live.png',
     schema: {
       '@context': 'https://schema.org',
       '@type': 'Service',
@@ -114,13 +114,13 @@ const ROUTE_SEO_CONFIG = {
     title: 'Reserve Studio Space & Halls | Kesari — The Memory Studio',
     description: 'Book the Main Concert Stage (200 pax), Acoustic Lounge (60 pax), or Creator Workshop Room (40 pax) in Koramangala. Transparent hourly packages.',
     canonical: 'https://kesaristudio.com/book',
-    ogImage: '/assets/events/kesari_stage_inside.jpg'
+    ogImage: '/assets/venue/kesari_main_stage_live.png'
   },
   '/audio-rental': {
     title: 'Professional Audio Equipment Rental in Bangalore | Yamaha PAs & Mixers',
     description: 'Rent Yamaha DBR active speakers, Soundcraft mixers, Shure microphones, subwoofers, and hire certified live sound engineers in Koramangala, Bangalore.',
     canonical: 'https://kesaristudio.com/audio-rental',
-    ogImage: '/assets/events/kesari_stage_inside.jpg',
+    ogImage: '/assets/venue/kesari_main_stage_live.png',
     schema: {
       '@context': 'https://schema.org',
       '@type': 'Service',
@@ -188,7 +188,7 @@ const ROUTE_SEO_CONFIG = {
     title: 'Studio Venue Gallery | Kesari — The Memory Studio Bangalore',
     description: 'Photo tour of the 200-seat Concert Hall, Acoustic Lounge, timber jam room, and artisanal cafe in Koramangala 4th Block.',
     canonical: 'https://kesaristudio.com/venue-gallery',
-    ogImage: '/assets/events/kesari_stage_inside.jpg'
+    ogImage: '/assets/venue/kesari_main_stage_live.png'
   },
   '/event-gallery': {
     title: 'Event Highlights Gallery | Live Gigs at Kesari Studio Bangalore',

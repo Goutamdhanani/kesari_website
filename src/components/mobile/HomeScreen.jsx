@@ -618,7 +618,7 @@ export default function HomeScreen({
                   {/* Real Photo Background of Inside Kesari Stage */}
                   <div 
                     className="organise-card-bg"
-                    style={{ backgroundImage: "url('/assets/events/kesari_stage_inside.jpg')" }}
+                    style={{ backgroundImage: "url('/assets/venue/kesari_main_stage_live.png')" }}
                   />
                   {/* Frosted Dark Gradient Overlay for High Contrast Text */}
                   <div className="organise-card-gradient" />
