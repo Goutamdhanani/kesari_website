@@ -36,7 +36,7 @@ if(isProduction){
   });
 } else {
   const{createServer}=await import('vite');
-  vite=await createServer({server:{middlewareMode:true,hmr:{server}},appType:'custom'});
+  vite=await createServer({server:{middlewareMode:true,hmr:{server},allowedHosts:true},appType:'custom'});
   app.use(vite.middlewares);
   app.get('/{*page}',async(req,res,next)=>{
     const url=req.originalUrl;
