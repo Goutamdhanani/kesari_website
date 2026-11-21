@@ -36,7 +36,7 @@ if(isProduction){
   });
 } else {
   const{createServer}=await import('vite');
-  vite=await createServer({server:{middlewareMode:true,hmr:{server},allowedHosts:true},appType:'custom'});
+  vite=await createServer({server:{middlewareMode:true,hmr:{server},allowedHosts:['thekesari.com','.thekesari.com','www.thekesari.com','concise-tan-mallard-10.hostingersite.com','.hostingersite.com','localhost','127.0.0.1']},appType:'custom'});
   app.use(vite.middlewares);
   app.get('/{*page}',async(req,res,next)=>{
     const url=req.originalUrl;
