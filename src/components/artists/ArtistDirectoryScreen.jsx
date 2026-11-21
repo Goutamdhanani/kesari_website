@@ -53,111 +53,6 @@ export const getArtistDisplayName = (artistOrName) => {
   return words[0];
 };
 
-// Realistic approved fallback artists representing Bangalore's vibrant indie scene
-const FALLBACK_APPROVED_ARTISTS = [
-  {
-    id: 'art-aarav-sharma',
-    name: 'Aarav Sharma',
-    genre: 'Vocalists',
-    city: 'Bangalore',
-    photoUrl: '/assets/events/real_kesari/kesari_ev_01.jpg',
-    videoUrl: 'https://www.youtube.com/watch?v=sample-aarav',
-    previousEvents: 'NH7 Weekender 2025, Bangalore Open Air, 40+ Acoustic Nights',
-    achievements: 'Winner of Bangalore Indie Voice 2024; debut EP charted #1 on Indie India',
-    openMic: true,
-    status: 'approved'
-  },
-  {
-    id: 'art-bgc-collective',
-    name: 'The Bangalore Groove Collective',
-    genre: 'Bands',
-    city: 'Bangalore',
-    photoUrl: '/assets/events/real_kesari/kesari_ev_51.jpg',
-    videoUrl: 'https://www.youtube.com/watch?v=sample-bgc',
-    previousEvents: 'Fandom Gigs, Hard Rock Cafe Bengaluru Tour, Kesari Monsoon Fest 2025',
-    achievements: 'Rolling Stone India Band to Watch 2025; Featured on Red Bull Tour Bus',
-    openMic: false,
-    status: 'approved'
-  },
-  {
-    id: 'art-rhea-nambiar',
-    name: 'Rhea Nambiar',
-    genre: 'Stand-up',
-    city: 'Bangalore',
-    photoUrl: '/assets/events/real_kesari/kesari_ev_06.jpg',
-    videoUrl: 'https://www.youtube.com/watch?v=sample-rhea',
-    previousEvents: 'Habitat Mumbai, Canvas Laugh Club, That Comedy Club Koramangala',
-    achievements: 'Amazon Prime MiniTV Special Comic, 2M+ views on YouTube special clip',
-    openMic: true,
-    status: 'approved'
-  },
-  {
-    id: 'art_102',
-    name: 'Meera Krishnan',
-    genre: 'Vocalists',
-    city: 'Bangalore',
-    photoUrl: '/assets/events/real_kesari/kesari_ev_01.jpg',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    bio: 'Soulful playback and indie vocalist blending classical Carnatic nuances with modern dream-pop and acoustic ballads.',
-    previousEvents: 'Kesari Sunset Acoustic Sessions, Bangalore International Centre, CounterCulture.',
-    achievements: 'Over 400k Spotify streams on debut single "Nila", featured on BBC Asian Network.',
-    openMic: true,
-    status: 'approved'
-  },
-  {
-    id: 'art_103',
-    name: 'DJ Prithvi & The Synthetix',
-    genre: 'DJs',
-    city: 'Bangalore',
-    photoUrl: '/assets/events/real_kesari/kesari_ev_35.jpg',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    bio: 'Melodic techno, afro-house and hybrid live synthesizer sets that create intoxicating late-night dancefloors.',
-    previousEvents: 'Resident at High Ultra Lounge, Sunburn Campus Bangalore, private rooftop sundowners.',
-    achievements: 'Signed with Deep Woods Records; supported international touring acts in Goa & Bangalore.',
-    openMic: false,
-    status: 'approved'
-  },
-  {
-    id: 'art_104',
-    name: 'Vikram Venkatesh',
-    genre: 'Stand-up',
-    city: 'Bangalore',
-    photoUrl: '/assets/events/real_kesari/kesari_ev_06.jpg',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    bio: 'Sharp, relatable observational stand-up covering tech corporate culture, Bangalore traffic, and desi parenting.',
-    previousEvents: 'The Habitat Mumbai, Canvas Laugh Club, sold-out 1-hour special "Startup Trauma" at Kesari Studio.',
-    achievements: 'Over 2.5 Million YouTube views; winner of Bangalore Comedy Fest Talent Hunt.',
-    openMic: true,
-    status: 'approved'
-  },
-  {
-    id: 'art_105',
-    name: 'Ananya Roy',
-    genre: 'Instrumental',
-    city: 'Bangalore',
-    photoUrl: '/assets/events/real_kesari/kesari_ev_22.jpg',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    bio: 'Virtuoso multi-instrumentalist performing evocative classical sitar, bansuri flute, and ambient guitar textures.',
-    previousEvents: 'National Gallery of Modern Art, Kesari Acoustic Sundays, private high-end soirees.',
-    achievements: 'All India Radio A-Grade artist; collaborated on award-winning documentary scores.',
-    openMic: true,
-    status: 'approved'
-  },
-  {
-    id: 'art_106',
-    name: 'Kabir Akhtar',
-    genre: 'Poet',
-    city: 'Bangalore',
-    photoUrl: '/assets/events/real_kesari/kesari_ev_12.jpg',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    bio: 'Bilingual Urdu and English spoken word poet and lyricist exploring modern love, alienation, and nostalgia.',
-    previousEvents: 'Spoken Fest, Bangalore Poetry Festival, featured curator at Kesari Open Mics.',
-    achievements: 'Published collection "Dilli Se Bangalore Tak"; TEDx speaker.',
-    openMic: true,
-    status: 'approved'
-  }
-];
-
 const FILTER_CATEGORIES = [
   { id: 'All', label: 'All Artists' },
   { id: 'Vocalists', label: 'Vocalists', match: ['Singer / Vocalist', 'Singer', 'Vocalist'] },
@@ -169,7 +64,7 @@ const FILTER_CATEGORIES = [
 ];
 
 export default function ArtistDirectoryScreen({ onNavigate, onBack }) {
-  const [artists, setArtists] = useState(FALLBACK_APPROVED_ARTISTS);
+  const [artists, setArtists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -219,23 +114,19 @@ export default function ArtistDirectoryScreen({ onNavigate, onBack }) {
           const data = await res.json();
           const list = Array.isArray(data) ? data : data.artists || [];
           if (isMounted) {
-            if (list.length > 0) {
-              // Privacy guarantee: strip any phone or email from state
-              const sanitized = list.map(a => {
-                const { phone, email, ...safe } = a;
-                return safe;
-              });
-              setArtists(sanitized);
-            } else {
-              setArtists(FALLBACK_APPROVED_ARTISTS);
-            }
+            // Privacy guarantee: strip any phone or email from state
+            const sanitized = list.map(a => {
+              const { phone, email, ...safe } = a;
+              return safe;
+            });
+            setArtists(sanitized);
           }
         } else {
-          if (isMounted) setArtists(FALLBACK_APPROVED_ARTISTS);
+          if (isMounted) setArtists([]);
         }
       } catch (err) {
-        console.warn('Using curated fallback roster for artists:', err);
-        if (isMounted) setArtists(FALLBACK_APPROVED_ARTISTS);
+        console.warn('Failed to fetch artists:', err);
+        if (isMounted) setArtists([]);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -513,7 +404,22 @@ Please share artist availability and technical rider!`;
         </div>
 
         {/* Artists Grid */}
-        {filteredArtists.length === 0 ? (
+        {artists.length === 0 ? (
+          <div className="empty-artists-state">
+            <Music size={44} className="empty-icon" />
+            <h3>No Artists Registered Yet</h3>
+            <p>The Kesari stage roster is open. Are you a musician, singer, band, or comedian? Register to be featured on our stage.</p>
+            <button
+              type="button"
+              className="reset-filters-btn"
+              style={{ background: '#DAFB71', color: '#08080A', fontWeight: 800, marginTop: '12px' }}
+              onClick={handleRegisterClick}
+            >
+              <Mic size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
+              Register as an Artist
+            </button>
+          </div>
+        ) : filteredArtists.length === 0 ? (
           <div className="empty-artists-state">
             <Music size={44} className="empty-icon" />
             <h3>No artists matched your filters</h3>

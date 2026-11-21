@@ -58,9 +58,9 @@
 .hero-light-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(55px);
-  will-change: transform, opacity;
+  filter: blur(24px);
   pointer-events: none;
+  opacity: 0.65;
 }
 
 .blob-purple {
@@ -68,8 +68,7 @@
   left: -20px;
   width: 280px;
   height: 280px;
-  background: radial-gradient(circle, rgba(147, 51, 234, 0.8) 0%, rgba(124, 58, 237, 0.45) 50%, transparent 75%);
-  animation: auroraPulsePurple 10s ease-in-out infinite alternate;
+  background: radial-gradient(circle, rgba(147, 51, 234, 0.6) 0%, rgba(124, 58, 237, 0.3) 50%, transparent 75%);
 }
 
 .blob-amber {
@@ -77,8 +76,7 @@
   right: -20px;
   width: 320px;
   height: 320px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.85) 0%, rgba(217, 119, 6, 0.45) 50%, transparent 75%);
-  animation: auroraPulseAmber 12s ease-in-out infinite alternate;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.6) 0%, rgba(217, 119, 6, 0.3) 50%, transparent 75%);
 }
 
 .blob-rose {
@@ -86,26 +84,7 @@
   left: 30%;
   width: 260px;
   height: 260px;
-  background: radial-gradient(circle, rgba(225, 29, 72, 0.6) 0%, rgba(190, 18, 60, 0.3) 50%, transparent 75%);
-  animation: auroraPulseRose 14s ease-in-out infinite alternate;
-}
-
-@keyframes auroraPulsePurple {
-  0% { transform: translate(0, 0) scale(1); opacity: 0.7; }
-  50% { transform: translate(16px, -12px) scale(1.15); opacity: 0.9; }
-  100% { transform: translate(-10px, 14px) scale(0.95); opacity: 0.65; }
-}
-
-@keyframes auroraPulseAmber {
-  0% { transform: translate(0, 0) scale(1); opacity: 0.75; }
-  50% { transform: translate(-18px, 15px) scale(1.2); opacity: 0.95; }
-  100% { transform: translate(12px, -10px) scale(0.9); opacity: 0.7; }
-}
-
-@keyframes auroraPulseRose {
-  0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-  50% { transform: translate(20px, 10px) scale(1.18); opacity: 0.75; }
-  100% { transform: translate(-15px, -15px) scale(0.9); opacity: 0.55; }
+  background: radial-gradient(circle, rgba(225, 29, 72, 0.45) 0%, rgba(190, 18, 60, 0.2) 50%, transparent 75%);
 }
 
 /* ── 1ST CARD: HERO CARD (TRANSLUCENT SPECULAR GLASS) ───────── */
@@ -114,9 +93,9 @@
   z-index: 2;
   overflow: hidden;
   border-radius: 24px;
-  background: rgba(14, 16, 28, 0.52) !important;
-  backdrop-filter: blur(28px) !important;
-  -webkit-backdrop-filter: blur(28px) !important;
+  background: rgba(14, 16, 28, 0.65) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   border: 1.5px solid rgba(255, 255, 255, 0.14) !important;
   padding: 20px 22px;
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.16);
@@ -379,66 +358,37 @@
   min-width: 0 !important;
 }
 
-/* Moving Light Behind Each Pillar Card */
+/* Soft Radial Light Behind Each Pillar Card */
 .pillar-ambient-light {
   position: absolute !important;
   inset: -12px !important;
   border-radius: 28px !important;
-  filter: blur(48px) !important;
-  opacity: 0.72 !important;
+  filter: blur(24px) !important;
+  opacity: 0.55 !important;
   z-index: 1 !important;
   pointer-events: none !important;
-  will-change: transform, opacity !important;
 }
 
 /* 1. Upcoming Events: Radiant Violet / Magenta Aurora */
 .light-events {
-  background: radial-gradient(circle at 75% 65%, rgba(168, 85, 247, 0.85) 0%, rgba(217, 70, 239, 0.5) 45%, transparent 75%) !important;
-  animation: floatEventsGlow 9s ease-in-out infinite alternate !important;
+  background: radial-gradient(circle at 75% 65%, rgba(168, 85, 247, 0.6) 0%, rgba(217, 70, 239, 0.3) 45%, transparent 75%) !important;
 }
 
-@keyframes floatEventsGlow {
-  0% { transform: translate(0, 0) scale(1); opacity: 0.65; }
-  50% { transform: translate(12px, -10px) scale(1.15); opacity: 0.88; }
-  100% { transform: translate(-8px, 12px) scale(0.95); opacity: 0.6; }
-}
-
-/* 2. Host a Event: Dual Glow (Amber Top-Left + Royal Blue Bottom-Right) */
+/* 2. Host an Event: Dual Glow (Amber Top-Left + Royal Blue Bottom-Right) */
 .light-host {
   background: 
-    radial-gradient(circle at 25% 20%, rgba(245, 158, 11, 0.85) 0%, transparent 60%),
-    radial-gradient(circle at 85% 85%, rgba(37, 99, 235, 0.88) 0%, transparent 65%) !important;
-  animation: floatHostGlow 11s ease-in-out infinite alternate !important;
-}
-
-@keyframes floatHostGlow {
-  0% { transform: translate(0, 0) scale(1); opacity: 0.7; }
-  50% { transform: translate(-14px, 12px) scale(1.18); opacity: 0.92; }
-  100% { transform: translate(10px, -12px) scale(0.92); opacity: 0.65; }
+    radial-gradient(circle at 25% 20%, rgba(245, 158, 11, 0.6) 0%, transparent 60%),
+    radial-gradient(circle at 85% 85%, rgba(37, 99, 235, 0.6) 0%, transparent 65%) !important;
 }
 
 /* 3. Audio Rentals: Warm Sunset Amber & Bronze Glow */
 .light-audio {
-  background: radial-gradient(circle at 35% 30%, rgba(245, 158, 11, 0.85) 0%, rgba(234, 88, 12, 0.55) 50%, transparent 75%) !important;
-  animation: floatAudioGlow 10s ease-in-out infinite alternate !important;
-}
-
-@keyframes floatAudioGlow {
-  0% { transform: translate(0, 0) scale(1); opacity: 0.65; }
-  50% { transform: translate(10px, 14px) scale(1.16); opacity: 0.88; }
-  100% { transform: translate(-12px, -8px) scale(0.94); opacity: 0.6; }
+  background: radial-gradient(circle at 35% 30%, rgba(245, 158, 11, 0.6) 0%, rgba(234, 88, 12, 0.3) 50%, transparent 75%) !important;
 }
 
 /* 4. Book an Artist: Deep Cobalt, Sapphire & Indigo Glow */
 .light-artists {
-  background: radial-gradient(circle at 80% 70%, rgba(37, 99, 235, 0.85) 0%, rgba(124, 58, 237, 0.55) 45%, transparent 75%) !important;
-  animation: floatArtistsGlow 12s ease-in-out infinite alternate !important;
-}
-
-@keyframes floatArtistsGlow {
-  0% { transform: translate(0, 0) scale(1); opacity: 0.7; }
-  50% { transform: translate(-10px, -12px) scale(1.18); opacity: 0.9; }
-  100% { transform: translate(12px, 10px) scale(0.92); opacity: 0.62; }
+  background: radial-gradient(circle at 80% 70%, rgba(37, 99, 235, 0.6) 0%, rgba(124, 58, 237, 0.3) 45%, transparent 75%) !important;
 }
 
 /* ── TRANSLUCENT GLASS CARD SURFACE ─────────────────────────── */
@@ -446,9 +396,9 @@
   position: relative !important;
   z-index: 2 !important;
   width: 100% !important;
-  background: rgba(13, 16, 28, 0.55) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
+  background: rgba(13, 16, 28, 0.65) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   border: 1.5px solid rgba(255, 255, 255, 0.13) !important;
   border-radius: 20px !important;
   padding: 12px 10px !important;

@@ -206,7 +206,9 @@ export default function AuroraFluidCanvas({ className = '' }) {
       lastTimestamp = null;
       if (document.hidden || !inView) return;
       draw();
-      if (!motionPreference.matches) animationFrameId = requestAnimationFrame(render);
+      if (!motionPreference.matches && !isMobile) {
+        animationFrameId = requestAnimationFrame(render);
+      }
     };
 
     resize();

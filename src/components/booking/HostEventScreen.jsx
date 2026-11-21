@@ -40,7 +40,7 @@ export const STUDIO_HALLS = [
     guestCount: 60,
     price: 'From ₹6,000',
     priceVal: 6000,
-    image: '/assets/events/kesari_lounge_inside.jpg',
+    image: '/assets/venue/IMG20260718173645.jpg',
     idealFor: 'Acoustic sessions, open mics, comedy, birthdays & listening circles',
     features: ['Soundproofed Timber', 'Shure Vocal Mics', 'Velvet Club Sofas', 'Artisanal Café Access'],
     bookingUrl: '/book?hall=acoustic-lounge'

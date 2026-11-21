@@ -60,8 +60,8 @@ export const VENUE_PHOTOS = [
     id: 'v8',
     area: 'lounge',
     areaLabel: 'Acoustic Lounge',
-    title: 'Acoustic Lounge Timber Den',
-    image: '/assets/events/kesari_lounge_inside.jpg'
+    title: 'Acoustic Lounge & Timber Den',
+    image: '/assets/venue/IMG20260718173645.jpg'
   },
   {
     id: 'v9',
@@ -75,7 +75,7 @@ export const VENUE_PHOTOS = [
     area: 'studio',
     areaLabel: 'Recording Studio',
     title: 'Recording Studio Sound Console',
-    image: '/assets/events/kesari_gear_inside.jpg'
+    image: '/assets/venue/IMG20260727002410.jpg'
   },
   {
     id: 'v11',

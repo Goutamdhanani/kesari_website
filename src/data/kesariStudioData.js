@@ -23,7 +23,7 @@ export const RENTAL_EQUIPMENT = [
     badge: '2 available',
     desc: 'High output powered active PA loudspeaker with crystal clear live acoustic projection',
     specs: ['1000W Class-D amplifier', '12" Woofer + 1.4" Driver', '131dB Max SPL', 'XLR / TRS inputs with D-CONTOUR DSP'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'speaker'
   },
   {
@@ -36,7 +36,7 @@ export const RENTAL_EQUIPMENT = [
     badge: 'Includes 2 mics',
     desc: 'High-power portable vertical tower sound column with 2 wireless mics included',
     specs: ['All-in-one column PA system', 'Built-in bluetooth & USB playback', 'Includes 2 cordless UHF handheld mics', 'Wide 140° acoustic dispersion'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'speaker'
   },
   {
@@ -49,7 +49,7 @@ export const RENTAL_EQUIPMENT = [
     badge: 'Concert Grade',
     desc: 'Professional high-throw line array sound system engineered for concerts, live auditoriums and open-air gigs',
     specs: ['2000W Bi-amped continuous output', 'Dual 8" Neodymium drivers + 3" titanium compression', '135dB Peak SPL', 'Precision rigging hardware & fly-bars'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'speaker'
   },
   {
@@ -62,7 +62,7 @@ export const RENTAL_EQUIPMENT = [
     badge: '4 available',
     desc: 'Low-profile floor wedge stage monitor delivering uncolored, feedback-resistant foldback audio to performers',
     specs: ['1100W Peak Class-D power', '12" Coaxial driver with 1" HF compression', 'Dual 43° / 55° wedge angles', 'Feedback-notch filter & DSP voicing presets'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'speaker'
   },
   {
@@ -75,7 +75,7 @@ export const RENTAL_EQUIPMENT = [
     badge: 'Heavy Bass',
     desc: 'Touring-grade active subwoofer delivering thunderous low-end down to 30Hz for electronic and live band setups',
     specs: ['1600W Class-D amplifier', '18" Long-excursion Ferrite woofer', '136dB Max SPL', 'Cardioid bass steering mode & D-XSUB processing'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'speaker'
   },
   {
@@ -88,7 +88,7 @@ export const RENTAL_EQUIPMENT = [
     badge: 'Compact 6CH',
     desc: 'Professional 6-channel analog mixing console with EQ & phantom power for acoustic sets',
     specs: ['2 XLR Mic preamps with 48V phantom power', '2 Stereo line inputs', '3-Band British EQ per channel', 'Gold-plated balanced XLR outputs'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'sliders'
   },
   {
@@ -101,7 +101,7 @@ export const RENTAL_EQUIPMENT = [
     badge: 'Pro 12CH',
     desc: 'Full-featured 12-channel live mixer with on-board SPX digital effects and multiple aux sends',
     specs: ['6 XLR Mic inputs with 1-knob compressors', '24 High-resolution SPX digital effect programs', '2 Aux sends + 1 stereo subgroup', 'USB 2.0 24-bit/192kHz interface'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'sliders'
   },
   {
@@ -114,7 +114,7 @@ export const RENTAL_EQUIPMENT = [
     badge: 'Studio Digital',
     desc: 'Industry-standard 40-input, 25-bus digital mixing console with motorized faders and full iPad remote mix control',
     specs: ['16 Fully programmable MIDAS microphone preamps', '17 Motorized 100mm faders', '8 Stereo FX engines (reverb, delay, dynamic EQ)', '32x32 USB multitrack recording capability'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'sliders'
   },
   {
@@ -127,7 +127,7 @@ export const RENTAL_EQUIPMENT = [
     badge: 'Pro DJ Console',
     desc: 'Professional 4-channel DJ performance controller with full-size jog wheels, track position display and Merge FX',
     specs: ['Full-size 206mm touch-capacitive jog wheels', 'Plug-and-play with Rekordbox & Serato DJ Pro', 'Jog Cutter scratch assistant & Sample Scratch', 'Dual USB ports for instant DJ handovers'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'sliders'
   },
   {
@@ -140,7 +140,7 @@ export const RENTAL_EQUIPMENT = [
     badge: '1 set available',
     desc: 'Dual handheld wireless microphone system with digital receiver and anti-drop frequency',
     specs: ['UHF dual-channel true diversity receiver', 'Cardioid dynamic capsule with pop filter', 'Operating range: up to 80m line-of-sight', 'Up to 10 hours runtime on AA batteries'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'mic'
   },
   {
@@ -153,7 +153,7 @@ export const RENTAL_EQUIPMENT = [
     badge: '2 available',
     desc: 'Industry standard dynamic wired microphone for vocals, instruments, and speech',
     specs: ['Unidirectional cardioid pickup pattern', 'Tailored frequency response: 50Hz to 15,000Hz', 'Internal shock mount minimizes handling noise', 'Includes 6m heavy duty XLR cable'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'mic'
   },
   {
@@ -166,7 +166,7 @@ export const RENTAL_EQUIPMENT = [
     badge: '4 available',
     desc: 'Legendary Shure SM58 vocal dynamic cardioid microphone for live performances',
     specs: ['The world standard live vocal microphone', 'Uniform cardioid pickup isolates main sound source', 'Built-in spherical wind and pop filter', 'Durable steel mesh grille and enamel-painted metal body'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'mic'
   },
   {
@@ -179,7 +179,7 @@ export const RENTAL_EQUIPMENT = [
     badge: 'Lead Vocalist Spec',
     desc: 'High-output supercardioid dynamic vocal mic tailored for warm vocals and maximum feedback rejection',
     specs: ['Supercardioid pattern for high gain before feedback', 'Neodymium magnet for high signal-to-noise ratio', 'Pneumatic shock mount system', 'Frequency response: 50Hz to 16,000Hz'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'mic'
   },
   {
@@ -192,7 +192,7 @@ export const RENTAL_EQUIPMENT = [
     badge: '3 available',
     desc: 'Heavy-duty adjustable boom microphone floor stand with stable tripod base',
     specs: ['Die-cast zinc base with rubber vibration dampening feet', 'Height adjustable: 900mm to 1600mm', 'Telescopic boom arm: 430mm to 740mm', 'Universal 5/8"-27 threading with 3/8" adapter'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'disc'
   },
   {
@@ -205,7 +205,7 @@ export const RENTAL_EQUIPMENT = [
     badge: '1 available',
     desc: 'Desktop / amplifier compact low-profile microphone stand',
     specs: ['Low profile heavy cast iron round base', 'Ideal for kick drums, guitar amp miking, desktop podcasts', 'Height adjustable: 280mm to 430mm', 'Anti-vibration rubber bottom rim'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'disc'
   },
   {
@@ -218,7 +218,7 @@ export const RENTAL_EQUIPMENT = [
     badge: 'Universal A-frame',
     desc: 'Cushioned universal folding A-frame stand for acoustic, electric, and bass guitars',
     specs: ['Soft neoprene rubber padding protects guitar finish', 'Fold-flat design for rapid transit', 'Stepped base cradle fits wide acoustic and thin electric guitars', 'Non-slip rubber feet'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'music'
   },
   {
@@ -231,7 +231,7 @@ export const RENTAL_EQUIPMENT = [
     badge: 'Pro balanced',
     desc: 'Balanced oxygen-free copper XLR male to female audio patch cable',
     specs: ['100% Oxygen-Free Copper (OFC) conductors', 'Heavy-duty Neutrik-style metal connectors', 'Braided shielding blocks RF and EMI interference', 'Flexible tangle-free matte PVC jacket'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'zap'
   },
   {
@@ -244,7 +244,7 @@ export const RENTAL_EQUIPMENT = [
     badge: '1/4" Instrument',
     desc: 'Low-noise shielded 1/4" mono instrument cable for guitars and keyboards',
     specs: ['6.35mm (1/4") Gold-tipped TS connectors', '20 AWG Ultra-low capacitance copper core', 'Dual shielding against hum and ground loops', 'Strain relief collar prevents cable fatigue'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'zap'
   },
   {
@@ -257,7 +257,7 @@ export const RENTAL_EQUIPMENT = [
     badge: 'Live Pro Mixing',
     desc: 'Experienced live audio sound engineer to set up, calibrate acoustics, and mix your live gig',
     specs: ['Full venue sound check & EQ calibration', 'Live dynamic vocal and instrumental balance', 'On-stage monitor mix adjustment for performers', '4 to 6 hours live session coverage'],
-    image: '/assets/events/kesari_gear_inside.jpg',
+    image: '/assets/venue/IMG20260727002410.jpg',
     icon: 'user'
   }
 ];
@@ -397,7 +397,7 @@ export const SPACE_RENTALS = [
     hourlyRate: '₹800 / hr',
     idealFor: 'Band Jamming, Podcasts, Vocal Tracking, Intimate Jam Circles',
     amenities: 'Guitar amps, vocal mics, drum rug, mood lighting, plush couches',
-    image: '/assets/events/kesari_lounge_inside.jpg'
+    image: '/assets/venue/IMG20260718173645.jpg'
   },
   {
     id: 'full-studio-buyout',

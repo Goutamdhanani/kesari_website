@@ -185,10 +185,10 @@ test('Artist API: public registration with Indian phone validation, privacy sani
   }
 
   try {
-    // 1. GET /api/artists returns pre-seeded approved artists without phone or email
+    // 1. GET /api/artists returns approved artists without phone or email
     const artistsRes = await call('/api/artists');
     assert.equal(artistsRes.status, 200);
-    assert.ok(artistsRes.data.length >= 3);
+    assert.ok(Array.isArray(artistsRes.data));
     for (const artist of artistsRes.data) {
       assert.equal(artist.status, 'approved');
       assert.equal(artist.phone, undefined, 'Public artist must NOT expose phone');

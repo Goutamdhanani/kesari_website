@@ -28,6 +28,7 @@ const port=Number(process.env.PORT)||3000,host=process.env.HOST||'0.0.0.0';
 const network=(host==='0.0.0.0'||host==='::')?lanUrls(port):[];
 if(network[0])writeNetworkQr(network[0],root).catch(()=>{});
 if(network[0])app.get('/network-qr.png',(req,res)=>{res.setHeader('Cache-Control','no-store');res.sendFile(path.join(root,'public/network-qr.png'));});
+app.get('/favicon.ico',(req,res)=>{res.setHeader('Content-Type','image/png');res.setHeader('Cache-Control','public, max-age=86400');res.sendFile(path.join(root,'public/assets/kesari-logo.png'));});
 const server=createHttpServer(app);let vite;
 const isProduction = process.argv.includes('--production') || process.env.NODE_ENV === 'production' || existsSync(path.join(root, 'dist/index.html'));
 if(isProduction){

@@ -179,7 +179,7 @@ const HOME_GENRE_IMAGES = {
   music: '/assets/events/real_kesari/kesari_ev_51.jpg',
   acoustic: '/assets/events/music.webp',
   rock: '/assets/events/real_kesari/kesari_ev_51.jpg',
-  jazz: '/assets/events/kesari_lounge_inside.jpg',
+  jazz: '/assets/venue/IMG20260718173645.jpg',
   electronic: '/assets/events/ev_sukoon.jpg',
   hiphop: '/assets/events/real_kesari/kesari_ev_34.jpg',
   openmic: '/assets/events/music.webp'
@@ -542,7 +542,7 @@ export default function HomeScreen({
                     type="button"
                     className="services-photo-preview"
                     aria-label="View Kesari studio spaces"
-                    style={{ backgroundImage: "url('/assets/events/kesari_lounge_inside.jpg')" }}
+                    style={{ backgroundImage: "url('/assets/venue/IMG20260718173645.jpg')" }}
                     onClick={() => setShowRentSpaceModal(true)}
                   >
                     <span className="services-photo-overlay" />

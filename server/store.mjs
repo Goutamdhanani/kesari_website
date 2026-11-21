@@ -344,65 +344,6 @@ const DEFAULT_MENU_ITEMS = [
   }
 ];
 
-const DEFAULT_ARTISTS = [
-  {
-    id: 'art-aarav-sharma',
-    name: 'Aarav Sharma',
-    genre: 'Vocalists',
-    email: 'aarav.sharma@example.com',
-    phone: '+919876543210',
-    city: 'Bangalore',
-    photoUrl: '/assets/events/real_kesari/kesari_ev_01.jpg',
-    videoUrl: 'https://www.youtube.com/watch?v=sample-aarav',
-    instagram: '@aaravmusic',
-    channel: 'https://youtube.com/@aaravmusic',
-    previousEvents: 'NH7 Weekender 2025, Bangalore Open Air, 40+ Acoustic Nights',
-    achievements: 'Winner of Bangalore Indie Voice 2024; debut EP charted #1 on Indie India',
-    costPerEvent: 15000,
-    openMic: true,
-    extraDetails: 'Bilingual singer-songwriter (Hindi & English acoustic pop/indie) performing with loop pedal and acoustic guitar.',
-    status: 'approved',
-    createdAt: '2026-01-10T10:00:00.000Z'
-  },
-  {
-    id: 'art-bgc-collective',
-    name: 'The Bangalore Groove Collective',
-    genre: 'Bands',
-    email: 'contact@bgcband.in',
-    phone: '+919845012345',
-    city: 'Bangalore',
-    photoUrl: '/assets/events/real_kesari/kesari_ev_51.jpg',
-    videoUrl: 'https://www.youtube.com/watch?v=sample-bgc',
-    instagram: '@bgc_live',
-    channel: 'https://youtube.com/@bgclive',
-    previousEvents: 'Fandom Gigs, Hard Rock Cafe Bengaluru Tour, Kesari Monsoon Fest 2025',
-    achievements: 'Rolling Stone India Band to Watch 2025; Featured on Red Bull Tour Bus',
-    costPerEvent: 35000,
-    openMic: false,
-    extraDetails: '5-piece funk, neo-soul & fusion band with brass section, live synths, and powerhouse rhythms.',
-    status: 'approved',
-    createdAt: '2026-01-15T12:00:00.000Z'
-  },
-  {
-    id: 'art-rhea-nambiar',
-    name: 'Rhea Nambiar',
-    genre: 'Stand-up',
-    email: 'rhea.comedy@example.com',
-    phone: '+919811223344',
-    city: 'Bangalore',
-    photoUrl: '/assets/events/real_kesari/kesari_ev_06.jpg',
-    videoUrl: 'https://www.youtube.com/watch?v=sample-rhea',
-    instagram: '@rheacomedy',
-    channel: 'https://youtube.com/@rheanambiar',
-    previousEvents: 'Habitat Mumbai, Canvas Laugh Club, That Comedy Club Koramangala',
-    achievements: 'Amazon Prime MiniTV Special Comic, 2M+ views on YouTube special clip',
-    costPerEvent: 20000,
-    openMic: true,
-    extraDetails: 'Sharp, relatable bilingual observational standup comedy about corporate life, dating in Bangalore, and indie studio culture.',
-    status: 'approved',
-    createdAt: '2026-02-01T15:30:00.000Z'
-  }
-];
 
 export function createStore(file) {
   const db = new DatabaseSync(file);
@@ -434,10 +375,8 @@ export function createStore(file) {
     }
   }
 
-  // Pre-seed approved artists
-  if (all('artist').length === 0) {
-    for (const art of DEFAULT_ARTISTS) put('artist', art.id, art);
-  }
+  // Purge any previously seeded fake/sample artists so only user-added artists show
+  db.prepare("DELETE FROM records WHERE kind='artist' AND (id LIKE 'art-%' OR id LIKE 'art_%')").run();
 
   function sold(id) { return all('order').filter(o => o.eventId === id && o.status === 'confirmed').reduce((n,o) => n+o.quantity,0); }
 

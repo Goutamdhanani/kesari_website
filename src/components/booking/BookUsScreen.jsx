@@ -77,7 +77,7 @@ export const KESARI_HALLS = [
     description: 'Soundproofed timber treatment, warm vintage lighting, and plush velvet seating create an intimate listening sanctuary. Engineered for unplugged acoustic sessions, live 4-host podcast recordings, band rehearsals, poetry circles, and private album listening rooms.',
     images: [
       '/assets/kesari-lounge.webp',
-      '/assets/events/kesari_lounge_inside.jpg',
+      '/assets/venue/IMG20260718173645.jpg',
       '/assets/events/lounge.webp'
     ],
     highlights: [
@@ -111,7 +111,7 @@ export const KESARI_HALLS = [
     description: 'A flexible, bright creative space outfitted with an ultra-bright 4K laser projector, modular workshop tables, daylight softbox lighting, and low-latency fiber WiFi. Designed for hands-on art & music workshops, corporate brainstorms, and community meetups.',
     images: [
       '/assets/events/workshop.webp',
-      '/assets/events/kesari_gear_inside.jpg',
+      '/assets/venue/IMG20260727002410.jpg',
       '/assets/events/cafe.webp'
     ],
     highlights: [
