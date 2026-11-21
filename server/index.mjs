@@ -15,15 +15,18 @@ mkdirSync('server/data',{recursive:true});mkdirSync('.local',{recursive:true});
 const database=process.env.DATABASE_PATH||path.join(root,'server/data/kesari.sqlite');
 const oldDatabase=path.resolve(root,'../16-10-26/kesari-react/server/data/kesari.sqlite');
 if(!process.env.DATABASE_PATH&&!existsSync(database)&&existsSync(oldDatabase)){
-  const source=new DatabaseSync(oldDatabase,{readOnly:true});try{await backup(source,database);}finally{source.close();}
-  console.log('Existing Kesari events and bookings migrated to this project.');
+  const source=new DatabaseSync(oldDatabase,{readOnly:true});
+  backup(source,database).then(()=>{
+    console.log('Existing Kesari events and bookings migrated to this project.');
+  }).catch(()=>{})
+  .finally(()=>source.close());
 }
 const passwordFile=path.join(root,'.local/admin-password.txt');
 if(!process.env.ADMIN_PASSWORD&&!existsSync(passwordFile))writeFileSync(passwordFile,randomBytes(24).toString('base64url'),{mode:0o600});
 const store=createStore(database),app=createApp(store,process.env.ADMIN_PASSWORD||readFileSync(passwordFile,'utf8').trim());
 const port=Number(process.env.PORT)||3000,host=process.env.HOST||'0.0.0.0';
 const network=(host==='0.0.0.0'||host==='::')?lanUrls(port):[];
-if(network[0])await writeNetworkQr(network[0],root);
+if(network[0])writeNetworkQr(network[0],root).catch(()=>{});
 if(network[0])app.get('/network-qr.png',(req,res)=>{res.setHeader('Cache-Control','no-store');res.sendFile(path.join(root,'public/network-qr.png'));});
 const server=createHttpServer(app);let vite;
 const isProduction = process.argv.includes('--production') || process.env.NODE_ENV === 'production' || existsSync(path.join(root, 'dist/index.html'));
@@ -35,22 +38,25 @@ if(isProduction){
     res.send(injectRouteSEO(raw,req.path));
   });
 } else {
-  const{createServer}=await import('vite');
-  vite=await createServer({server:{middlewareMode:true,hmr:{server},allowedHosts:['thekesari.com','.thekesari.com','www.thekesari.com','concise-tan-mallard-10.hostingersite.com','.hostingersite.com','localhost','127.0.0.1']},appType:'custom'});
-  app.use(vite.middlewares);
-  app.get('/{*page}',async(req,res,next)=>{
-    const url=req.originalUrl;
-    try {
-      let raw=readFileSync(path.join(root,'index.html'),'utf8');
-      raw=await vite.transformIndexHtml(url,raw);
-      res.setHeader('Content-Type','text/html; charset=utf-8');
-      res.send(injectRouteSEO(raw,req.path));
-    } catch(e) {
-      vite.ssrFixStacktrace(e);
-      next(e);
-    }
-  });
+  import('vite').then(async ({createServer})=>{
+    vite=await createServer({server:{middlewareMode:true,hmr:{server},allowedHosts:['thekesari.com','.thekesari.com','www.thekesari.com','concise-tan-mallard-10.hostingersite.com','.hostingersite.com','localhost','127.0.0.1']},appType:'custom'});
+    app.use(vite.middlewares);
+    app.get('/{*page}',async(req,res,next)=>{
+      const url=req.originalUrl;
+      try {
+        let raw=readFileSync(path.join(root,'index.html'),'utf8');
+        raw=await vite.transformIndexHtml(url,raw);
+        res.setHeader('Content-Type','text/html; charset=utf-8');
+        res.send(injectRouteSEO(raw,req.path));
+      } catch(e) {
+        vite.ssrFixStacktrace(e);
+        next(e);
+      }
+    });
+  }).catch(e=>console.error('Vite dev error:',e));
 }
 server.listen(port,host,()=>console.log(`Kesari ready: http://localhost:${port}/\n${network.map(url=>'Network: '+url).join('\n')}\nAdmin: http://localhost:${port}/#/admin\nAdmin password is in .local/admin-password.txt`));
 async function close(){await vite?.close();server.close(()=>{store.db.close();process.exit(0);});}
 process.on('SIGTERM',close);process.on('SIGINT',close);
+export { app, server, store };
+export default app;
