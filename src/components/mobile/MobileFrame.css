@@ -48,6 +48,13 @@
   z-index: 0;
 }
 
+@media (max-width: 768px) {
+  .eventjam-web-app-viewport::before,
+  .eventjam-web-app-viewport::after {
+    display: none !important;
+  }
+}
+
 /* ── Central Application Stage ────────────────── */
 .eventjam-app-stage {
   width: 100%;

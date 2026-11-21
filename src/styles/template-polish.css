@@ -27,7 +27,13 @@ button { line-height: 1.3; transition-property: transform, opacity; }
   background: radial-gradient(ellipse at 20% 0%, rgb(132 44 241 / 38%), transparent 57%),
     radial-gradient(ellipse at 85% 24%, rgb(28 128 237 / 24%), transparent 50%), #09070F;
 }
-.aurora-fluid-canvas { filter: blur(10px) saturate(175%) hue-rotate(12deg); -webkit-filter: blur(10px) saturate(175%) hue-rotate(12deg); opacity: .72; }
+.aurora-fluid-canvas { opacity: .78; }
+@media (min-width: 769px) {
+  .aurora-fluid-canvas { filter: blur(6px) saturate(140%); -webkit-filter: blur(6px) saturate(140%); }
+}
+@media (max-width: 768px) {
+  .aurora-fluid-canvas { filter: none !important; -webkit-filter: none !important; }
+}
 .aurora-fluid-vignette {
   background: radial-gradient(ellipse at 10% 5%, rgb(234 54 198 / 18%), transparent 53%),
     radial-gradient(ellipse at 92% 4%, rgb(45 181 255 / 17%), transparent 48%),
@@ -418,7 +424,6 @@ select:focus-visible, textarea:focus-visible { outline: 2px solid #BFA0FF; outli
   background: radial-gradient(ellipse at 20% 0%, rgb(0 66 217 / 40%), transparent 57%),
     radial-gradient(ellipse at 85% 24%, rgb(73 143 255 / 24%), transparent 50%), #090D17;
 }
-.aurora-fluid-canvas { filter: blur(10px) saturate(145%); -webkit-filter: blur(10px) saturate(145%); }
 .aurora-fluid-vignette {
   background: radial-gradient(ellipse at 10% 5%, rgb(0 66 217 / 15%), transparent 53%),
     radial-gradient(ellipse at 92% 4%, rgb(73 143 255 / 13%), transparent 48%),

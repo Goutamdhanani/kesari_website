@@ -22,17 +22,21 @@ export default function AuroraFluidCanvas({ className = '' }) {
     let time = 1400;
     const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+    let inView = true;
+    const isMobile = typeof window !== 'undefined' && (window.innerWidth < 768 || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches));
+    const targetFpsInterval = isMobile ? 33 : 16; // ~30fps on mobile for 120hz smooth scrolling; 60fps on desktop
+
     // Handle high-DPI retina displays
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
       width = rect.width;
       height = rect.height;
       canvas.width = Math.max(width * dpr, 100);
       canvas.height = Math.max(height * dpr, 100);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
-      if (!document.hidden) draw();
+      if (!document.hidden && inView) draw();
     };
 
     // 4 Distinct Northern Lights Fluid Ribbon Curtains
@@ -103,7 +107,7 @@ export default function AuroraFluidCanvas({ className = '' }) {
 
       ribbons.forEach((ribbon) => {
         const baseY = height * ribbon.baseY;
-        const waveStep = 6;
+        const waveStep = isMobile ? 18 : 6;
         const points = [];
 
         // Calculate smooth undulating ribbon baseline using superposition of waves
@@ -120,30 +124,32 @@ export default function AuroraFluidCanvas({ className = '' }) {
 
         if (points.length < 2) return;
 
-        // A) Draw Vertical Magnetic Auroral Rays (The iconic Northern Lights "curtain" look)
-        const rayStep = width / ribbon.rayCount;
-        for (let r = 0; r < ribbon.rayCount; r++) {
-          const rayX = r * rayStep + Math.sin(time * 0.001 + r) * 6;
-          const t = time * ribbon.speed;
-          const rayBaseY =
-            baseY +
-            Math.sin(rayX * ribbon.freq + t + ribbon.phase) * ribbon.amplitude +
-            Math.cos(rayX * (ribbon.freq * 0.65) - t * 0.8) * (ribbon.amplitude * 0.55);
+        // A) Draw Vertical Magnetic Auroral Rays (On desktop only — skipping on mobile saves 140+ gradient allocations per frame)
+        if (!isMobile) {
+          const rayStep = width / ribbon.rayCount;
+          for (let r = 0; r < ribbon.rayCount; r++) {
+            const rayX = r * rayStep + Math.sin(time * 0.001 + r) * 6;
+            const t = time * ribbon.speed;
+            const rayBaseY =
+              baseY +
+              Math.sin(rayX * ribbon.freq + t + ribbon.phase) * ribbon.amplitude +
+              Math.cos(rayX * (ribbon.freq * 0.65) - t * 0.8) * (ribbon.amplitude * 0.55);
 
-          // Ray oscillates upward into the night sky
-          const rayLength =
-            ribbon.curtainHeight * (0.6 + 0.4 * Math.sin(r * 0.45 + time * 0.002));
-          const rayAlpha =
-            0.07 + 0.10 * Math.sin(r * 0.6 + time * 0.0025);
+            // Ray oscillates upward into the night sky
+            const rayLength =
+              ribbon.curtainHeight * (0.6 + 0.4 * Math.sin(r * 0.45 + time * 0.002));
+            const rayAlpha =
+              0.07 + 0.10 * Math.sin(r * 0.6 + time * 0.0025);
 
-          if (rayAlpha > 0.05) {
-            const rayGrad = ctx.createLinearGradient(rayX, rayBaseY, rayX, rayBaseY - rayLength);
-            rayGrad.addColorStop(0, ribbon.rayColor.replace(/[\d\.]+\)$/, `${rayAlpha})`));
-            rayGrad.addColorStop(0.5, ribbon.gradientMid.replace(/[\d\.]+\)$/, `${rayAlpha * 0.5})`));
-            rayGrad.addColorStop(1, 'rgba(0,0,0,0)');
+            if (rayAlpha > 0.05) {
+              const rayGrad = ctx.createLinearGradient(rayX, rayBaseY, rayX, rayBaseY - rayLength);
+              rayGrad.addColorStop(0, ribbon.rayColor.replace(/[\d\.]+\)$/, `${rayAlpha})`));
+              rayGrad.addColorStop(0.5, ribbon.gradientMid.replace(/[\d\.]+\)$/, `${rayAlpha * 0.5})`));
+              rayGrad.addColorStop(1, 'rgba(0,0,0,0)');
 
-            ctx.fillStyle = rayGrad;
-            ctx.fillRect(rayX - 1.5, rayBaseY - rayLength, 3, rayLength);
+              ctx.fillStyle = rayGrad;
+              ctx.fillRect(rayX - 1.5, rayBaseY - rayLength, 3, rayLength);
+            }
           }
         }
 
@@ -183,7 +189,11 @@ export default function AuroraFluidCanvas({ className = '' }) {
 
     const render = (timestamp) => {
       animationFrameId = null;
-      if (document.hidden || motionPreference.matches) return;
+      if (document.hidden || !inView || motionPreference.matches) return;
+      if (lastTimestamp !== null && (timestamp - lastTimestamp) < targetFpsInterval) {
+        animationFrameId = requestAnimationFrame(render);
+        return;
+      }
       if (lastTimestamp !== null) time += Math.min(timestamp - lastTimestamp, 40);
       lastTimestamp = timestamp;
       draw();
@@ -194,7 +204,7 @@ export default function AuroraFluidCanvas({ className = '' }) {
       if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
       animationFrameId = null;
       lastTimestamp = null;
-      if (document.hidden) return;
+      if (document.hidden || !inView) return;
       draw();
       if (!motionPreference.matches) animationFrameId = requestAnimationFrame(render);
     };
@@ -202,6 +212,21 @@ export default function AuroraFluidCanvas({ className = '' }) {
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
+
+    let io = null;
+    if (typeof IntersectionObserver !== 'undefined') {
+      io = new IntersectionObserver(([entry]) => {
+        inView = Boolean(entry?.isIntersecting);
+        if (inView) {
+          syncPlayback();
+        } else if (animationFrameId !== null) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = null;
+        }
+      }, { threshold: 0.05 });
+      io.observe(canvas);
+    }
+
     document.addEventListener('visibilitychange', syncPlayback);
     motionPreference.addEventListener('change', syncPlayback);
     syncPlayback();
@@ -209,6 +234,7 @@ export default function AuroraFluidCanvas({ className = '' }) {
     return () => {
       if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
       ro.disconnect();
+      if (io) io.disconnect();
       document.removeEventListener('visibilitychange', syncPlayback);
       motionPreference.removeEventListener('change', syncPlayback);
     };

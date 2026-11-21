@@ -896,3 +896,43 @@
   font-size: 11px;
   color: #6C7290;
 }
+
+/* ============================================================
+   MOBILE PERFORMANCE & BUTTERY 120FPS HARDWARE ACCELERATION
+   Eliminates fill-rate bottlenecks, blur stack, and scroll jank
+   ============================================================ */
+@media (max-width: 768px) {
+  /* 1. Stop all infinite background blur animations on mobile */
+  .hero-light-blob,
+  .pillar-ambient-light {
+    animation: none !important;
+    filter: blur(20px) !important;
+    opacity: 0.55 !important;
+    will-change: auto !important;
+    transform: none !important;
+  }
+
+  /* 2. Lighten frosted backdrop-filter on mobile cards */
+  .landing-hero-card-clean,
+  .clean-star-card,
+  .landing-section-card,
+  .landing-audio-strip-card,
+  .landing-studio-capsule {
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    background: rgba(13, 16, 26, 0.94) !important;
+    will-change: auto !important;
+  }
+
+  /* 3. Offscreen Content Visibility: browser skips layout/paint until scrolled near */
+  .landing-screen-root > section {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 450px;
+  }
+
+  /* 4. Touch acceleration and momentum physics */
+  .landing-screen-root {
+    -webkit-overflow-scrolling: touch;
+    transform: translateZ(0);
+  }
+}

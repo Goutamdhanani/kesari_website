@@ -12,8 +12,13 @@ const LIGHT_PROPERTIES = ['--surface-x', '--surface-y', '--surface-turn', '--sur
 
 export default function useSurfaceLight(appRef) {
   useEffect(() => {
+    // Only run on desktop devices with a mouse/fine pointer; touch devices don't have hover/mouse reflection
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+    if (!finePointer.matches) return;
+
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (reducedMotion.matches) return;
+
     let activeSurface = null;
     let pendingFrame = null;
     let pointerX = 0;

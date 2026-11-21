@@ -15,6 +15,11 @@
 }
 
 /* Base Body Resets */
+html {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: auto;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -22,6 +27,8 @@ body {
   font-family: var(--font-family-sans, -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', sans-serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
 }
 
 /* User Global Animation Rules */

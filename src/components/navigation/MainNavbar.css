@@ -20,6 +20,14 @@
               border-color 0.25s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
+@media (max-width: 768px) {
+  .kesari-main-header {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    background: rgba(10, 11, 18, 0.96) !important;
+  }
+}
+
 .kesari-main-header.is-scrolled {
   background: rgba(10, 11, 18, 0.96);
   border-bottom-color: rgba(218, 251, 113, 0.2);
