@@ -1,0 +1,33 @@
+/* ============================================================
+   EVENT JAM — Core Root Application Styles
+   ============================================================ */
+
+.eventjam-root-app {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--color-true-black, #08080A);
+  color: #0C0D12;
+  position: relative;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Base Body Resets */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #08080A;
+  font-family: var(--font-family-sans, -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* User Global Animation Rules */
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 0.25s;
+  animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+}

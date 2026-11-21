@@ -1,0 +1,135 @@
+@font-face {
+  font-family: "Manrope";
+  src: url("/fonts/Manrope-Variable.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+}
+
+:root {
+  /* ============================================================
+     BLACK GLASS & LIQUID SPECTRUM
+     Concert light on a quiet, near-black stage
+     ============================================================ */
+
+  /* Canvas and raised surfaces */
+  --color-canvas-warm: #080808;
+  --color-canvas-card: #12141D;
+  --color-canvas-muted: #0D0F15;
+  --color-canvas-subtle: #181B25;
+
+  /* Typography */
+  --color-ink-primary: #F5F7FB;
+  --color-ink-secondary: #B8C0CF;
+  --color-ink-tertiary: #929BAD;
+  --color-pure-white: #FFFFFF;
+
+  /* Legacy bento names retained for existing components */
+  --color-bento-lilac: #121B35;
+  --color-bento-lilac-border: #263C70;
+  --color-bento-mint: #111B19;
+  --color-bento-mint-border: #2A4B3A;
+  --color-bento-butter: #1B1D13;
+  --color-bento-butter-border: #4A512B;
+  --color-bento-peach: #21141A;
+  --color-bento-peach-border: #59313B;
+  --color-bento-dark: #0D0F15;
+
+  /* Supporting Accents & Cinematic Colors */
+  --color-netflix-red: #EE3D5A;
+  --color-netflix-red-glow: rgb(238 61 90 / 35%);
+  --color-crimson: #EE3D5A;
+  --color-royal-blue: #0042D9;
+  --color-electric-lime: #DAFB71;
+  --color-accent-hover: #E8FFA7;
+  --color-accent-soft: #14264D;
+  --color-border: #293449;
+  --color-accent-readable: #C9D7FF;
+  --color-violet-rim: #A9C2FF;
+  --color-true-black: #080808;
+  --light-violet: #7896FF;
+  --light-magenta: #FF7086;
+  --light-cobalt: #0042D9;
+  --light-cyan: #9BBEFF;
+  --surface-glass: linear-gradient(145deg, rgb(20 37 75 / 68%), rgb(12 15 24 / 96%) 68%);
+  --surface-pearl: radial-gradient(ellipse at 22% 0%, rgb(255 255 255 / 78%), transparent 62%), linear-gradient(135deg, #ECFFB8, #DAFB71 56%, #C9EA59);
+  --surface-pearl-ink: #17200B;
+
+  /* Apple Human Interface Guidelines (HIG) Typography */
+  --font-family-display: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-family-body: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-family-serif: var(--font-family-display);
+  --font-family-mono: "SF Mono", Menlo, Monaco, Consolas, monospace;
+
+  /* Radii */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-pill: 9999px;
+
+  /* Surface depth */
+  --shadow-subtle: inset 0 1px 0 rgb(198 214 255 / 7%), 0 2px 10px rgb(0 0 0 / 28%);
+  --shadow-card: inset 0 1px 0 rgb(198 214 255 / 9%), 0 8px 28px rgb(0 0 0 / 38%);
+  --shadow-float: inset 0 1px 0 rgb(210 224 255 / 12%), 0 16px 44px rgb(0 0 0 / 52%);
+
+  /* Transitions */
+  --transition-fast: 0.18s cubic-bezier(0.19, 1, 0.22, 1);
+  --transition-smooth: 0.28s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Reset & Global Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  background-color: var(--color-canvas-muted);
+  color: var(--color-ink-primary);
+  font-family: var(--font-family-body);
+  font-weight: 400;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  outline: none;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+button:active {
+  transform: scale(0.96);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(95 132 220 / 34%);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(123 159 238 / 56%);
+}
+
+button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--color-ink-primary);
+  outline-offset: 3px;
+}
+a { -webkit-tap-highlight-color: transparent; }
+button, input { -webkit-tap-highlight-color: transparent; }

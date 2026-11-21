@@ -1,0 +1,120 @@
+/* ============================================================
+   EVENT JAM WEB APPLICATION — True Responsive Architecture
+   (Kesari Electric Editorial & Apple HIG Dark Cobalt Craftsmanship)
+   ============================================================ */
+
+/* Outer App Viewport Canvas */
+.eventjam-web-app-viewport {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: 
+    radial-gradient(ellipse at 50% 0%, rgba(0, 66, 217, 0.12) 0%, transparent 65%),
+    radial-gradient(ellipse at 85% 100%, rgba(218, 251, 113, 0.05) 0%, transparent 55%),
+    #08080A;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  position: relative;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  color: #FFFFFF;
+}
+
+/* Atmospheric Ambient Lights (Subtle Dark Glows) */
+.eventjam-web-app-viewport::before {
+  content: '';
+  position: fixed;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 66, 217, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.eventjam-web-app-viewport::after {
+  content: '';
+  position: fixed;
+  bottom: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(218, 251, 113, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Central Application Stage ────────────────── */
+.eventjam-app-stage {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Screen Viewport Container ────────────────── */
+.eventjam-screen-viewport {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── In-App Toast Feedback Banner ─────────────── */
+.in-app-toast-pill {
+  position: fixed;
+  top: 78px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(14, 16, 24, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 20px;
+  border-radius: 999px;
+  z-index: 9999;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(218, 251, 113, 0.15);
+  border: 1px solid rgba(218, 251, 113, 0.3);
+  white-space: nowrap;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Persistent Fixed Floating Navigation Bar ──── */
+.mobile-fixed-bottom-nav-root {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 990;
+  pointer-events: none;
+  padding-bottom: env(safe-area-inset-bottom, 12px);
+}
+
+.mobile-fixed-bottom-nav-root > * {
+  pointer-events: auto;
+}
