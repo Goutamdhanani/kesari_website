@@ -9,26 +9,22 @@
   background-color: var(--color-true-black, #08080A);
   color: #0C0D12;
   position: relative;
-  overflow-x: hidden;
+  overflow: visible;
   margin: 0;
   padding: 0;
 }
 
 /* Base Body Resets */
-html {
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: auto;
-}
-
-body {
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   margin: 0;
   padding: 0;
   background-color: #08080A;
   font-family: var(--font-family-sans, -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', sans-serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: none;
 }
 
 /* User Global Animation Rules */
