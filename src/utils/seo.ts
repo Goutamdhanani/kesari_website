@@ -158,7 +158,7 @@ export function updatePageSeo(target: { section: string; subPage?: string }) {
 
   const key = target.subPage || target.section || 'explore';
   const meta = SEO_METADATA[key] || SEO_METADATA.explore;
-  const baseUrl = 'https://kesaristudio.com';
+  const baseUrl = 'https://www.thekesari.com';
   const currentPath = target.subPage
     ? `/${target.section}/${target.subPage}`
     : target.section === 'explore'
