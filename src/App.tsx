@@ -896,6 +896,20 @@ export default function App() {
               </motion.div>
             )}
           </AnimatePresence>
+
+          <footer className="mt-8 pb-6 text-center">
+            <p className="text-[11px] tracking-wide text-white/25">
+              managed by{' '}
+              <a
+                href="https://www.oddwebs.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline decoration-white/15 underline-offset-4 hover:text-white/60 hover:decoration-white/40 transition-colors"
+              >
+                www.oddwebs.com
+              </a>
+            </p>
+          </footer>
         </main>
       </div>
 
