@@ -567,7 +567,7 @@ function parseFydoHTML(html, originalInput = '') {
 }
 
 const DEFAULT_QR_TARGETS = {
-  cafe: '/menu',
+  cafe: '/cafe',
   events: '/schedule',
   artists: '/artists/register',
   home: '/',
@@ -592,10 +592,10 @@ async function handleQrRedirect(req, res) {
     const settings = await dbService.getSettings();
     const targets = { ...DEFAULT_QR_TARGETS, ...(settings.qrTargets || {}) };
     const slug = String(req.params.slug || 'cafe').toLowerCase().trim();
-    let destination = String(targets[slug] || targets.cafe || '/menu').trim();
+    let destination = String(targets[slug] || targets.cafe || '/cafe').trim();
 
     if (!destination) {
-      destination = '/menu';
+      destination = '/cafe';
     }
 
     // Preserve ?table=... for cafe seating QR codes when redirecting to an internal path or URL
@@ -608,7 +608,7 @@ async function handleQrRedirect(req, res) {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.redirect(302, destination);
   } catch {
-    res.redirect(302, '/menu');
+    res.redirect(302, '/cafe');
   }
 }
 

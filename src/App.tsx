@@ -101,7 +101,11 @@ function parsePathToNav(pathname: string): { tab: NavTab; subPage?: string } {
   if (clean === 'search') return { tab: 'search' };
   if (clean === 'schedule') return { tab: 'schedule' };
   if (clean === 'passes') return { tab: 'passes' };
-  if (clean === 'menu' || clean === 'cafe') return { tab: 'menu' };
+  if (clean === 'menu' || clean === 'cafe' || clean === 'qr' || clean === 'qr/cafe') {
+    return { tab: 'menu' };
+  }
+  if (clean === 'qr/events') return { tab: 'schedule' };
+  if (clean === 'qr/artists') return { tab: 'artists' };
   if (clean === 'artists' || clean.startsWith('artists/')) {
     const parts = clean.split('/');
     return { tab: 'artists', subPage: parts[1] };
@@ -210,12 +214,15 @@ export default function App() {
     let url = '/';
     if (activeTab === 'about' || activeTab === 'connect' || activeTab === 'help') {
       url = `/${activeTab}/${activeStudioSubPage}`;
+    } else if (activeTab === 'menu') {
+      url = '/cafe';
     } else if (activeTab !== 'explore') {
       url = `/${activeTab}`;
     }
 
     if (typeof window !== 'undefined' && window.location.pathname !== url) {
-      window.history.pushState(null, '', url);
+      const search = activeTab === 'menu' ? window.location.search : '';
+      window.history.pushState(null, '', `${url}${search}`);
     }
     updatePageSeo({
       section: activeTab,
@@ -870,14 +877,7 @@ export default function App() {
                 onSelectEvent={(evt) => setCheckoutEventId(evt.id)}
                 onOpenService={(kind) => setActiveServiceKind(kind)}
                 onOpenArtists={() => handleSelectTab('artists')}
-                onOpenCafe={() => {
-                  handleSelectTab('explore');
-                  setTimeout(() => {
-                    document
-                      .getElementById('kesari-cafe-section')
-                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }, 180);
-                }}
+                onOpenCafe={() => handleSelectTab('menu')}
               />
             )}
 
@@ -893,6 +893,19 @@ export default function App() {
 
             {activeTab === 'menu' && (
               <div className="space-y-4">
+                <div className="flex items-center justify-between gap-3">
+                  <button
+                    type="button"
+                    onClick={() => handleSelectTab('explore')}
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-xs font-medium text-white/80 hover:text-white transition-colors"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Back to Studio</span>
+                  </button>
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#D8FF48]">
+                    Kesari Café · Koramangala
+                  </span>
+                </div>
                 <FoodSection
                   initialSeatingLocation={
                     typeof window !== 'undefined'

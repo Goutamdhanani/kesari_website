@@ -21,7 +21,7 @@ type QrPresetId = 'cafe' | 'events' | 'artists' | 'home' | 'custom';
 const PRODUCTION_DOMAIN = 'https://www.thekesari.com';
 
 const DEFAULT_TARGETS: Record<Exclude<QrPresetId, 'custom'>, string> = {
-  cafe: '/menu',
+  cafe: '/cafe',
   events: '/schedule',
   artists: '/artists/register',
   home: '/',
@@ -38,7 +38,7 @@ const PRESETS: Array<{
   {
     id: 'cafe',
     label: 'Café Menu QR',
-    path: '/menu',
+    path: '/cafe',
     qrSlug: '/qr',
     description: 'Permanent /qr link — redirects to Café Menu (changeable anytime)',
     Icon: Coffee,
