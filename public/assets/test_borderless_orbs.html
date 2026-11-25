@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      background: #050507;
+      margin: 0;
+      padding: 60px 40px;
+      display: flex;
+      gap: 36px;
+      justify-content: center;
+      align-items: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif;
+    }
+    .orb-button {
+      background: transparent;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      outline: none;
+      transition: transform 0.25s ease;
+    }
+    .orb-button:hover {
+      transform: translateY(-3px) scale(1.03);
+    }
+    /* Seamless borderless container for the glowing energy sphere */
+    .plasma-sphere-stage {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Ambient back glow - soft and ethereal */
+    .plasma-glow {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      filter: blur(28px);
+      pointer-events: none;
+    }
+    .glow-1 {
+      background: rgba(99, 102, 241, 0.45);
+    }
+    .glow-2 {
+      background: rgba(245, 158, 11, 0.42);
+    }
+    .glow-3 {
+      background: rgba(216, 255, 72, 0.38);
+    }
+    /* The cropped GIF element seamlessly blended with radial mask */
+    .plasma-sphere-img {
+      position: absolute;
+      width: 290px;
+      height: 218px;
+      max-width: none;
+      max-height: none;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+      -webkit-mask-image: radial-gradient(circle at center, black 58%, transparent 72%);
+      mask-image: radial-gradient(circle at center, black 58%, transparent 72%);
+    }
+    .filter-1 {
+      /* Pristine crisp original indigo/blue with boosted clarity */
+      filter: contrast(110%) brightness(1.15) saturate(120%);
+    }
+    .filter-2 {
+      /* Warm sunset amber / fiery golden plasma */
+      filter: hue-rotate(152deg) contrast(115%) brightness(1.12) saturate(160%);
+    }
+    .filter-3 {
+      /* Electric neon acid-lime / emerald plasma */
+      filter: hue-rotate(256deg) contrast(115%) brightness(1.2) saturate(175%);
+    }
+    .orb-label {
+      margin-top: 10px;
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      text-align: center;
+    }
+    .orb-pill {
+      margin-top: 4px;
+      font-size: 10.5px;
+      font-weight: 500;
+      padding: 2px 9px;
+      border-radius: 999px;
+      letter-spacing: -0.01em;
+    }
+    .pill-1 {
+      color: #C4B5FD;
+      background: rgba(124, 58, 237, 0.16);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    .pill-2 {
+      color: #FED7AA;
+      background: rgba(249, 115, 22, 0.16);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .pill-3 {
+      color: #D8FF48;
+      background: rgba(216, 255, 72, 0.12);
+      border: 1px solid rgba(216, 255, 72, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <!-- Sphere 1: Live Events -->
+  <button class="orb-button">
+    <div class="plasma-sphere-stage">
+      <div class="plasma-glow glow-1"></div>
+      <img src="plasma_sphere.gif" class="plasma-sphere-img filter-1" />
+    </div>
+    <span class="orb-label">Live Events</span>
+    <span class="orb-pill pill-1">7 Live Gigs</span>
+  </button>
+
+  <!-- Sphere 2: Organise Event -->
+  <button class="orb-button">
+    <div class="plasma-sphere-stage">
+      <div class="plasma-glow glow-2"></div>
+      <img src="plasma_sphere.gif" class="plasma-sphere-img filter-2" />
+    </div>
+    <span class="orb-label">Organise Event</span>
+    <span class="orb-pill pill-2">Studio Buyout</span>
+  </button>
+
+  <!-- Sphere 3: Gear & Spaces -->
+  <button class="orb-button">
+    <div class="plasma-sphere-stage">
+      <div class="plasma-glow glow-3"></div>
+      <img src="plasma_sphere.gif" class="plasma-sphere-img filter-3" />
+    </div>
+    <span class="orb-label">Gear & Spaces</span>
+    <span class="orb-pill pill-3">13 Audio Rentals</span>
+  </button>
+</body>
+</html>

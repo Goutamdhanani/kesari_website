@@ -1,100 +1,120 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Homepage -->
   <url>
-    <loc>https://thekesari.com/</loc>
-    <lastmod>2026-11-21</lastmod>
+    <loc>https://kesaristudio.com/</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Page 1: ABOUT KESARI -->
   <url>
-    <loc>https://thekesari.com/events</loc>
-    <lastmod>2026-11-21</lastmod>
+    <loc>https://kesaristudio.com/about/our-story</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://kesaristudio.com/about/meet-the-founder</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://kesaristudio.com/about/our-journey</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://kesaristudio.com/about/our-community</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://kesaristudio.com/about/why-kesari</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Page 2: CONNECT WITH US -->
+  <url>
+    <loc>https://kesaristudio.com/connect/contact-us</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.9</priority>
+    <priority>0.95</priority>
   </url>
   <url>
-    <loc>https://thekesari.com/events/amour</loc>
-    <lastmod>2026-11-21</lastmod>
+    <loc>https://kesaristudio.com/connect/collaborate</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://kesaristudio.com/connect/partner</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://thekesari.com/host-event</loc>
-    <lastmod>2026-11-21</lastmod>
+    <loc>https://kesaristudio.com/connect/join-artists</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://thekesari.com/book</loc>
-    <lastmod>2026-11-21</lastmod>
+    <loc>https://kesaristudio.com/connect/corporate</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Page 3: HELP & INFORMATION -->
+  <url>
+    <loc>https://kesaristudio.com/help/faq</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://thekesari.com/audio-rental</loc>
-    <lastmod>2026-11-21</lastmod>
+    <loc>https://kesaristudio.com/help/booking-payment</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://thekesari.com/artists</loc>
-    <lastmod>2026-11-21</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://kesaristudio.com/help/cancellation-refund</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://thekesari.com/artists/register</loc>
-    <lastmod>2026-11-21</lastmod>
+    <loc>https://kesaristudio.com/help/terms</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://thekesari.com/menu</loc>
-    <lastmod>2026-11-21</lastmod>
+    <loc>https://kesaristudio.com/help/privacy</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Key Studio Views -->
+  <url>
+    <loc>https://kesaristudio.com/schedule</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://thekesari.com/order-food</loc>
-    <lastmod>2026-11-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://thekesari.com/venue-gallery</loc>
-    <lastmod>2026-11-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://thekesari.com/event-gallery</loc>
-    <lastmod>2026-11-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://thekesari.com/contact</loc>
-    <lastmod>2026-11-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <!-- Aliases for kesaristudio.com -->
-  <url>
-    <loc>https://kesaristudio.com/events</loc>
-    <lastmod>2026-11-21</lastmod>
+    <loc>https://kesaristudio.com/search</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://kesaristudio.com/menu</loc>
-    <lastmod>2026-11-21</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://kesaristudio.com/audio-rental</loc>
-    <lastmod>2026-11-21</lastmod>
-    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 </urlset>

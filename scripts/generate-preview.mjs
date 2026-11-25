@@ -1,0 +1,100 @@
+import fs from 'node:fs';
+
+const html = `<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      background: #050507;
+      margin: 0;
+      padding: 50px;
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      align-items: center;
+      font-family: sans-serif;
+    }
+    .orb-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .orb-circle {
+      position: relative;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #000;
+    }
+    .orb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.36);
+    }
+    .orb-1 {
+      border: 2px solid rgba(139, 92, 246, 0.85);
+      box-shadow: 0 0 30px rgba(139, 92, 246, 0.5), inset 0 0 15px rgba(139, 92, 246, 0.3);
+    }
+    .orb-1 .orb-img {
+      filter: saturate(140%) brightness(1.05);
+    }
+    .orb-2 {
+      border: 2px solid rgba(245, 158, 11, 0.85);
+      box-shadow: 0 0 30px rgba(245, 158, 11, 0.5), inset 0 0 15px rgba(245, 158, 11, 0.3);
+    }
+    .orb-2 .orb-img {
+      filter: hue-rotate(155deg) saturate(180%) brightness(1.1);
+    }
+    .orb-3 {
+      border: 2px solid rgba(216, 255, 72, 0.85);
+      box-shadow: 0 0 30px rgba(216, 255, 72, 0.45), inset 0 0 15px rgba(216, 255, 72, 0.3);
+    }
+    .orb-3 .orb-img {
+      filter: hue-rotate(255deg) saturate(180%) brightness(1.15);
+    }
+    .title {
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="orb-container">
+    <div class="orb-circle orb-1">
+      <img src="plasma_sphere.gif" class="orb-img" />
+    </div>
+    <span class="title">Live Events</span>
+    <span class="badge" style="color:#C4B5FD; border-color:#7C3AED;">7 Live Gigs</span>
+  </div>
+
+  <div class="orb-container">
+    <div class="orb-circle orb-2">
+      <img src="plasma_sphere.gif" class="orb-img" />
+    </div>
+    <span class="title">Organise Event</span>
+    <span class="badge" style="color:#FED7AA; border-color:#F97316;">Studio Buyout</span>
+  </div>
+
+  <div class="orb-container">
+    <div class="orb-circle orb-3">
+      <img src="plasma_sphere.gif" class="orb-img" />
+    </div>
+    <span class="title">Gear & Spaces</span>
+    <span class="badge" style="color:#D8FF48; border-color:#D8FF48;">13 Audio Rentals</span>
+  </div>
+</body>
+</html>`;
+
+fs.writeFileSync('x:/district/public/assets/preview_orbs.html', html);
+console.log('preview_orbs.html created successfully.');

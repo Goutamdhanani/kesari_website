@@ -1,0 +1,6 @@
+{
+  "name": "Kesari - The Memory Studio",
+  "description": "Kesari - The Memory Studio, Koramangala, Bangalore. Mobile-first event studio for discovering curated live gigs, calibrating passes, renting sound systems, and studio memberships.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
