@@ -106,15 +106,22 @@ async function renderQrWithLogo(
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
-      const badgeSize = Math.round(size * 0.24);
-      const badgeX = Math.round((size - badgeSize) / 2);
-      const badgeY = Math.round((size - badgeSize) / 2);
-      const radius = Math.round(badgeSize * 0.22);
+      const maxBadgeW = Math.round(size * 0.34);
+      const padX = 16;
+      const padY = 12;
+      const aspect = img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 3.2;
+      const drawW = maxBadgeW - padX * 2;
+      const drawH = Math.round(drawW / aspect);
+      const badgeW = drawW + padX * 2;
+      const badgeH = drawH + padY * 2;
+      const badgeX = Math.round((size - badgeW) / 2);
+      const badgeY = Math.round((size - badgeH) / 2);
+      const radius = 20;
 
       // Clean white rounded badge behind logo for 100% scan reliability
       ctx.save();
       ctx.beginPath();
-      ctx.roundRect(badgeX, badgeY, badgeSize, badgeSize, radius);
+      ctx.roundRect(badgeX, badgeY, badgeW, badgeH, radius);
       ctx.fillStyle = '#FFFFFF';
       ctx.fill();
       ctx.lineWidth = 4;
@@ -122,18 +129,11 @@ async function renderQrWithLogo(
       ctx.stroke();
       ctx.restore();
 
-      const pad = Math.round(badgeSize * 0.12);
-      ctx.drawImage(
-        img,
-        badgeX + pad,
-        badgeY + pad,
-        badgeSize - pad * 2,
-        badgeSize - pad * 2
-      );
+      ctx.drawImage(img, badgeX + padX, badgeY + padY, drawW, drawH);
       resolve();
     };
     img.onerror = () => resolve();
-    img.src = '/assets/kesari-logo-512.png';
+    img.src = '/assets/kesari-logo.png';
   });
 
   return canvas.toDataURL('image/png');
