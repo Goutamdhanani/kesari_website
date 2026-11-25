@@ -1,15 +1,20 @@
 {
-  "name": "react-example",
+  "name": "kesari-memory-studio",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "main": "index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "server": "node server/index.mjs",
     "start": "node server/index.mjs",
     "build": "vite build",
+    "postinstall": "npm run build",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
@@ -26,6 +31,7 @@
     "qrcode": "^1.5.4",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
+    "tailwindcss": "^4.3.3",
     "vite": "^8.3.0"
   },
   "devDependencies": {
@@ -39,7 +45,6 @@
     "autoprefixer": "^10.4.21",
     "esbuild": "^0.25.0",
     "puppeteer-core": "^25.17.0",
-    "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
     "typescript": "^7.0.2"
   }

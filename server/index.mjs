@@ -566,17 +566,30 @@ function parseFydoHTML(html, originalInput = '') {
   return result;
 }
 
-// Serve production build if exists
+// Serve production build if exists (Hostinger / Production mode)
 const distPath = path.join(__dirname, '..', 'dist');
+const publicPath = path.join(__dirname, '..', 'public');
+
 if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath));
+  app.use(express.static(distPath, { maxAge: '1h' }));
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api')) return next();
     res.sendFile(path.join(distPath, 'index.html'));
   });
+} else if (fs.existsSync(publicPath)) {
+  app.use(express.static(publicPath));
 }
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`[Kesari Studio Server] Listening on http://0.0.0.0:${PORT}`);
-  console.log(`[Kesari Studio Server] Admin Password: ${ADMIN_PASSWORD}`);
-});
+const isPortNumber = /^\d+$/.test(String(PORT));
+const server = isPortNumber
+  ? app.listen(Number(PORT), '0.0.0.0', () => {
+      console.log(`[Kesari Studio Server] Listening on http://0.0.0.0:${PORT}`);
+      console.log(`[Kesari Studio Server] Admin Password: ${ADMIN_PASSWORD}`);
+    })
+  : app.listen(PORT, () => {
+      console.log(`[Kesari Studio Server] Listening on socket ${PORT}`);
+      console.log(`[Kesari Studio Server] Admin Password: ${ADMIN_PASSWORD}`);
+    });
+
+export { app, server };
+export default app;
