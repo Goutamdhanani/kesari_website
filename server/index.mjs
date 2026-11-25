@@ -566,6 +566,55 @@ function parseFydoHTML(html, originalInput = '') {
   return result;
 }
 
+const DEFAULT_QR_TARGETS = {
+  cafe: '/menu',
+  events: '/schedule',
+  artists: '/artists/register',
+  home: '/',
+};
+
+// Public read of permanent QR redirect targets
+app.get('/api/qr/targets', async (req, res) => {
+  try {
+    const settings = await dbService.getSettings();
+    res.json({
+      ok: true,
+      qrTargets: { ...DEFAULT_QR_TARGETS, ...(settings.qrTargets || {}) },
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Permanent redirectable QR endpoints (printed QR never changes; target can be updated anytime)
+async function handleQrRedirect(req, res) {
+  try {
+    const settings = await dbService.getSettings();
+    const targets = { ...DEFAULT_QR_TARGETS, ...(settings.qrTargets || {}) };
+    const slug = String(req.params.slug || 'cafe').toLowerCase().trim();
+    let destination = String(targets[slug] || targets.cafe || '/menu').trim();
+
+    if (!destination) {
+      destination = '/menu';
+    }
+
+    // Preserve ?table=... for cafe seating QR codes when redirecting to an internal path or URL
+    const tableParam = typeof req.query.table === 'string' ? req.query.table.trim() : '';
+    if (tableParam) {
+      const sep = destination.includes('?') ? '&' : '?';
+      destination = `${destination}${sep}table=${encodeURIComponent(tableParam)}`;
+    }
+
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.redirect(302, destination);
+  } catch {
+    res.redirect(302, '/menu');
+  }
+}
+
+app.get('/qr', handleQrRedirect);
+app.get('/qr/:slug', handleQrRedirect);
+
 // Serve production build if exists (Hostinger / Production mode)
 const distPath = path.join(__dirname, '..', 'dist');
 const publicPath = path.join(__dirname, '..', 'public');
