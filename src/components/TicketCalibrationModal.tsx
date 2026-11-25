@@ -385,6 +385,7 @@ export const TicketCalibrationModal: React.FC<TicketCalibrationModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label={`Ticket checkout for ${event.title}`}
+      data-lenis-prevent
       className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-end sm:items-center justify-center sm:p-6 overflow-y-auto"
     >
       <div className="w-full h-full sm:h-auto sm:max-w-[460px] lg:max-w-[920px] bg-[#050507] sm:rounded-[38px] border border-white/10 overflow-hidden flex flex-col justify-between lg:grid lg:grid-cols-2 shadow-2xl">

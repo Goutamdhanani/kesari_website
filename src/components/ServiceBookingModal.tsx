@@ -179,6 +179,7 @@ export const ServiceBookingModal: React.FC<ServiceBookingModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label={copy.title}
+      data-lenis-prevent
       className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-end sm:items-center justify-center sm:p-6 overflow-y-auto"
     >
       <motion.div

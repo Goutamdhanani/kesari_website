@@ -40,6 +40,12 @@ import { ContactSection } from './components/ContactSection';
 import { MinimalMenuBar } from './components/MinimalMenuBar';
 import { StudioPagesView, MainSectionKey } from './components/StudioPagesView';
 import { updatePageSeo } from './utils/seo';
+import {
+  initSmoothScroll,
+  refreshScrollAnimations,
+  resetScrollPosition,
+  setSmoothScrollPaused,
+} from './utils/smoothScroll';
 import { TicketCalibrationModal } from './components/TicketCalibrationModal';
 import { ServiceBookingModal } from './components/ServiceBookingModal';
 import { OrganiseEventModal } from './components/OrganiseEventModal';
@@ -176,6 +182,28 @@ export default function App() {
   const [activeStudioSubPage, setActiveStudioSubPage] = useState<string>(
     initialNav.subPage || 'our-story'
   );
+
+  // Ultra-smooth Lenis + GSAP ScrollTrigger lifecycle
+  useEffect(() => {
+    const cleanup = initSmoothScroll();
+    return cleanup;
+  }, []);
+
+  useEffect(() => {
+    const hasOverlayOpen = Boolean(
+      checkoutEventId || activeServiceKind || organiseOpen || showStudioMenu || showNotifications
+    );
+    setSmoothScrollPaused(hasOverlayOpen);
+  }, [checkoutEventId, activeServiceKind, organiseOpen, showStudioMenu, showNotifications]);
+
+  useEffect(() => {
+    if (isInitialLoading || isTabLoading) return;
+    resetScrollPosition();
+    const timer = window.setTimeout(() => {
+      refreshScrollAnimations();
+    }, 60);
+    return () => window.clearTimeout(timer);
+  }, [activeTab, isInitialLoading, isTabLoading]);
 
   // Sync browser URL & Dynamic SEO on tab/subpage changes
   useEffect(() => {
@@ -793,26 +821,38 @@ export default function App() {
                 />
 
                 {/* Studio Services + Organise Your Event Bento */}
-                <StudioServicesSection
-                  bookingsCount={bookings.length}
-                  onOpenService={(kind) => setActiveServiceKind(kind)}
-                  onPlanEvent={() => setOrganiseOpen(true)}
-                />
+                <div data-reveal className="will-animate">
+                  <StudioServicesSection
+                    bookingsCount={bookings.length}
+                    onOpenService={(kind) => setActiveServiceKind(kind)}
+                    onPlanEvent={() => setOrganiseOpen(true)}
+                  />
+                </div>
 
                 {/* Venue Accommodations & Amenities */}
-                <VenueAccommodationsSection />
+                <div data-reveal className="will-animate">
+                  <VenueAccommodationsSection />
+                </div>
 
                 {/* Venue Gallery ("The KESARI Experience") */}
-                <GallerySection />
+                <div data-reveal className="will-animate">
+                  <GallerySection />
+                </div>
 
                 {/* Event Gallery ("Memories are made here") */}
-                <EventGallerySection />
+                <div data-reveal className="will-animate">
+                  <EventGallerySection />
+                </div>
 
                 {/* Food & Extras placeholder */}
-                <FoodSection />
+                <div data-reveal className="will-animate">
+                  <FoodSection />
+                </div>
 
                 {/* Contact Us */}
-                <ContactSection />
+                <div data-reveal className="will-animate">
+                  <ContactSection />
+                </div>
               </div>
             )}
 

@@ -106,6 +106,7 @@ export const MinimalMenuBar: React.FC<MinimalMenuBarProps> = ({
           role="dialog"
           aria-modal="true"
           aria-label="Kesari Studio Navigation"
+          data-lenis-prevent
           className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-3 sm:p-6 overflow-y-auto"
         >
           {/* Backdrop */}
