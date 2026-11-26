@@ -35,7 +35,7 @@ import { StudioServicesSection } from './components/StudioServicesSection';
 import { GallerySection } from './components/GallerySection';
 import { EventGallerySection } from './components/EventGallerySection';
 import { VenueAccommodationsSection } from './components/VenueAccommodationsSection';
-import { FoodSection } from './components/FoodSection';
+import { FoodSection, MenuItem } from './components/FoodSection';
 import { ContactSection } from './components/ContactSection';
 import { MinimalMenuBar } from './components/MinimalMenuBar';
 import { StudioPagesView, MainSectionKey } from './components/StudioPagesView';
@@ -177,6 +177,7 @@ export default function App() {
   const [notifications, setNotifications] = useState<StudioNotification[]>(
     INITIAL_NOTIFICATIONS
   );
+  const [cafeMenu, setCafeMenu] = useState<MenuItem[] | undefined>(undefined);
 
   useEffect(() => {
     // Sync with backend API if running
@@ -188,6 +189,9 @@ export default function App() {
             const hasAmour = prev.some((e) => e.id === 'amour');
             return sanitizeEvents(hasAmour ? prev : data.events);
           });
+        }
+        if (data?.settings?.cafeMenu && Array.isArray(data.settings.cafeMenu) && data.settings.cafeMenu.length > 0) {
+          setCafeMenu(data.settings.cafeMenu);
         }
       })
       .catch(() => {});
@@ -879,6 +883,7 @@ export default function App() {
                 <div data-reveal className="will-animate">
                   <FoodSection
                     compact
+                    menuItems={cafeMenu}
                     onViewFullMenu={() => handleSelectTab('menu')}
                   />
                 </div>
@@ -934,6 +939,7 @@ export default function App() {
                   </span>
                 </div>
                 <FoodSection
+                  menuItems={cafeMenu}
                   initialSeatingLocation={
                     typeof window !== 'undefined'
                       ? new URLSearchParams(window.location.search).get('table') || ''

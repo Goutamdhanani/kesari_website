@@ -33,8 +33,9 @@ import {
 } from '../utils/studioLogic';
 import { StudioArtist } from './ArtistsPage';
 import { QrStudioTab } from './QrStudioTab';
+import { CafeAdminTab } from './CafeAdminTab';
 
-type AdminTab = 'events' | 'artists' | 'orders' | 'enquiries' | 'qr' | 'settings';
+type AdminTab = 'events' | 'cafe' | 'artists' | 'orders' | 'enquiries' | 'qr' | 'settings';
 
 interface StudioManagerViewProps {
   events: StudioEvent[];
@@ -308,6 +309,18 @@ export const StudioManagerView: React.FC<StudioManagerViewProps> = ({
         >
           <Layers className="w-3.5 h-3.5" />
           <span>Events ({events.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('cafe')}
+          className={`h-9 px-4 rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+            activeTab === 'cafe'
+              ? 'bg-white text-black'
+              : 'bg-white/5 text-white/70 hover:text-white'
+          }`}
+        >
+          <span>Café Menu</span>
         </button>
 
         <button
@@ -601,6 +614,8 @@ export const StudioManagerView: React.FC<StudioManagerViewProps> = ({
           )}
         </section>
       )}
+
+      {activeTab === 'cafe' && <CafeAdminTab />}
 
       {activeTab === 'qr' && <QrStudioTab />}
 

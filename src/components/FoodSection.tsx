@@ -35,7 +35,7 @@ export interface MenuItem {
   badge?: string;
 }
 
-const MENU_CATEGORIES: Array<{
+export const MENU_CATEGORIES: Array<{
   id: MenuCategoryId;
   label: string;
   shortLabel: string;
@@ -139,6 +139,7 @@ interface FoodSectionProps {
   initialSeatingLocation?: string;
   compact?: boolean;
   onViewFullMenu?: () => void;
+  menuItems?: MenuItem[];
 }
 
 const COMPACT_SNACK_IDS = ['m1', 'm5', 'm11', 'a4', 'a7', 'si2'];
@@ -148,7 +149,9 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
   initialSeatingLocation = '',
   compact = false,
   onViewFullMenu,
+  menuItems,
 }) => {
+  const activeItems = menuItems && menuItems.length > 0 ? menuItems : ALL_ITEMS;
   const [filter, setFilter] = useState<MenuFilter>('all');
   const [cart, setCart] = useState<Record<string, number>>({});
   const [customerName, setCustomerName] = useState('');
@@ -181,7 +184,7 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
   // Cart summary calculations
   const cartEntries = Object.entries(cart)
     .map(([id, qty]) => {
-      const item = ALL_ITEMS.find((it) => it.id === id);
+      const item = activeItems.find((it) => it.id === id);
       return item ? { ...item, qty, itemTotal: item.price * qty } : null;
     })
     .filter((e): e is NonNullable<typeof e> => e !== null);
@@ -353,7 +356,7 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
               onClick={onViewFullMenu}
               className="self-start sm:self-auto ml-6 sm:ml-0 px-3.5 py-1.5 rounded-full bg-white/8 hover:bg-white/15 border border-white/15 text-xs font-semibold text-white transition-colors"
             >
-              Full Menu ({ALL_ITEMS.length}) &rarr;
+              Full Menu ({activeItems.length}) &rarr;
             </button>
           )
         ) : (
@@ -367,10 +370,10 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
                   : 'bg-white/6 text-white/60 hover:text-white border border-white/8'
               }`}
             >
-              All ({ALL_ITEMS.length})
+              All ({activeItems.length})
             </button>
             {MENU_CATEGORIES.map((cat) => {
-              const count = ALL_ITEMS.filter((i) => i.categoryId === cat.id).length;
+              const count = activeItems.filter((i) => i.categoryId === cat.id).length;
               return (
                 <button
                   key={cat.id}
@@ -399,7 +402,7 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
               <span className="text-[11px] text-white/40">{COMPACT_SNACK_IDS.length} Picks</span>
             </div>
             <div className="flex gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory">
-              {ALL_ITEMS.filter((i) => COMPACT_SNACK_IDS.includes(i.id)).map((item, index) =>
+              {activeItems.filter((i) => COMPACT_SNACK_IDS.includes(i.id)).map((item, index) =>
                 renderCard(item, index)
               )}
             </div>
@@ -411,7 +414,7 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
               <span className="text-[11px] text-white/40">{COMPACT_BEVERAGE_IDS.length} Picks</span>
             </div>
             <div className="flex gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory">
-              {ALL_ITEMS.filter((i) => COMPACT_BEVERAGE_IDS.includes(i.id)).map((item, index) =>
+              {activeItems.filter((i) => COMPACT_BEVERAGE_IDS.includes(i.id)).map((item, index) =>
                 renderCard(item, index)
               )}
             </div>
@@ -419,7 +422,7 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
         </>
       ) : (
         MENU_CATEGORIES.filter((cat) => filter === 'all' || filter === cat.id).map((cat) => {
-          const items = ALL_ITEMS.filter((i) => i.categoryId === cat.id);
+          const items = activeItems.filter((i) => i.categoryId === cat.id);
           return (
             <div key={cat.id} className="space-y-2 pt-1">
               <div className="flex items-center justify-between px-1">
