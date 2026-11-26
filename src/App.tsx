@@ -129,12 +129,31 @@ function parsePathToNav(pathname: string): { tab: NavTab; subPage?: string } {
   return { tab: 'explore' };
 }
 
+const LEGACY_EVENT_IMAGE_MAP: Record<string, string> = {
+  '/assets/events/book_us_01_live_music.jpg': '/assets/events/ev_sukoon.jpg',
+  '/assets/events/book_us_02_spoken_word.jpg': '/assets/events/ev_openmic.jpg',
+  '/assets/book-us/book_us_03_concerts.jpg': '/assets/events/ev_rock.jpg',
+  '/assets/book-us/book_us_05_comedy.jpg': '/assets/events/ev_comedy_kesari.jpg',
+  '/assets/book-us/book_us_06_dance.jpg': '/assets/events/ev_dance_kesari.jpg',
+};
+
+function sanitizeEvents(list: StudioEvent[]): StudioEvent[] {
+  return list.map((evt) => {
+    const mapped = LEGACY_EVENT_IMAGE_MAP[evt.imageUrl];
+    if (mapped) return { ...evt, imageUrl: mapped };
+    if (evt.imageUrl && evt.imageUrl.includes('book_us_')) {
+      return { ...evt, imageUrl: '/assets/events/kesari_stage_inside.jpg' };
+    }
+    return evt;
+  });
+}
+
 export default function App() {
   const [initialNav] = useState(() =>
     parsePathToNav(typeof window !== 'undefined' ? window.location.pathname : '')
   );
   const [events, setEvents] = useState<StudioEvent[]>(() =>
-    loadStoredArray(EVENTS_STORAGE_KEY, INITIAL_EVENTS)
+    sanitizeEvents(loadStoredArray(EVENTS_STORAGE_KEY, INITIAL_EVENTS))
   );
   const [artists, setArtists] = useState<StudioArtist[]>(() =>
     loadStoredArray('kesari_artists_v1', [])
@@ -167,7 +186,7 @@ export default function App() {
         if (data && data.events && Array.isArray(data.events) && data.events.length > 0) {
           setEvents((prev) => {
             const hasAmour = prev.some((e) => e.id === 'amour');
-            return hasAmour ? prev : data.events;
+            return sanitizeEvents(hasAmour ? prev : data.events);
           });
         }
       })

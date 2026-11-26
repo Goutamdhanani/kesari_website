@@ -254,6 +254,10 @@ export const PassesAndShowsRow: React.FC<PassesAndShowsRowProps> = ({
                   src={evt.imageUrl}
                   alt={evt.title}
                   referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = '/assets/events/kesari_stage_inside.jpg';
+                  }}
                   className="pointer-events-none absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div
