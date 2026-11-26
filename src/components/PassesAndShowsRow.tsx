@@ -124,6 +124,7 @@ const BOOK_US_FOR_ITEMS: BookUsItem[] = [
     description: 'Team get-togethers, employee engagement, recognition ceremonies and office celebrations.',
     glow: 'rgba(34, 197, 94, 0.25)',
     accent: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10',
+    imageUrl: '/assets/book-us/book_us_11_corporate.jpg',
   },
   {
     id: 12,
@@ -132,6 +133,7 @@ const BOOK_US_FOR_ITEMS: BookUsItem[] = [
     description: 'Product showcases, brand experiences, media previews and launch events.',
     glow: 'rgba(251, 146, 60, 0.25)',
     accent: 'text-orange-400 border-orange-500/30 bg-orange-500/10',
+    imageUrl: '/assets/book-us/book_us_12_brand.jpg',
   },
   {
     id: 13,
@@ -140,6 +142,7 @@ const BOOK_US_FOR_ITEMS: BookUsItem[] = [
     description: 'Book releases, readings, author interactions and literary gatherings.',
     glow: 'rgba(168, 85, 247, 0.25)',
     accent: 'text-purple-400 border-purple-500/30 bg-purple-500/10',
+    imageUrl: '/assets/book-us/book_us_13_literary.jpg',
   },
   {
     id: 14,
@@ -148,6 +151,7 @@ const BOOK_US_FOR_ITEMS: BookUsItem[] = [
     description: 'Board games, hobby clubs, social gatherings and interest-based communities.',
     glow: 'rgba(45, 212, 191, 0.25)',
     accent: 'text-teal-400 border-teal-500/30 bg-teal-500/10',
+    imageUrl: '/assets/book-us/book_us_14_community.jpg',
   },
   {
     id: 15,
@@ -156,6 +160,7 @@ const BOOK_US_FOR_ITEMS: BookUsItem[] = [
     description: 'Art workshops, interactive learning, creative classes and skill-building sessions.',
     glow: 'rgba(234, 179, 8, 0.25)',
     accent: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10',
+    imageUrl: '/assets/book-us/book_us_15_masterclass.jpg',
   },
 ];
 
