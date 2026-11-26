@@ -42,6 +42,19 @@ interface StudioManagerViewProps {
   metrics: StudioMetrics;
   passes?: TicketPass[];
   bookings?: StudioBooking[];
+  enquiries?: Array<{
+    id: string;
+    type?: string;
+    title?: string;
+    detail?: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    message?: string;
+    bookingCode?: string;
+    createdAt?: string;
+  }>;
+  initialSettings?: Record<string, any>;
   artists?: Array<StudioArtist & { status?: string; phone?: string; email?: string }>;
   openCreateOnMount?: boolean;
   onConsumeOpenCreate?: () => void;
@@ -68,6 +81,8 @@ export const StudioManagerView: React.FC<StudioManagerViewProps> = ({
   metrics,
   passes = [],
   bookings = [],
+  enquiries = [],
+  initialSettings,
   artists = [],
   openCreateOnMount,
   onConsumeOpenCreate,
@@ -115,6 +130,18 @@ export const StudioManagerView: React.FC<StudioManagerViewProps> = ({
   const [address, setAddress] = useState(KESARI_CONTACT.fullAddress);
   const [checkinWebhookUrl, setCheckinWebhookUrl] = useState('');
   const [settingsSaved, setSettingsSaved] = useState(false);
+
+  useEffect(() => {
+    if (!initialSettings) return;
+    if (initialSettings.upiId) setUpiId(initialSettings.upiId);
+    if (initialSettings.payeeName) setPayeeName(initialSettings.payeeName);
+    if (initialSettings.phone) setPhone(initialSettings.phone);
+    if (initialSettings.email) setEmail(initialSettings.email);
+    if (initialSettings.address) setAddress(initialSettings.address);
+    if (typeof initialSettings.checkinWebhookUrl === 'string') {
+      setCheckinWebhookUrl(initialSettings.checkinWebhookUrl);
+    }
+  }, [initialSettings]);
 
   // Backend / MongoDB Atlas Health state
   const [dbHealth, setDbHealth] = useState<{
@@ -708,12 +735,36 @@ export const StudioManagerView: React.FC<StudioManagerViewProps> = ({
             </h3>
           </div>
 
-          {bookings.length === 0 ? (
+          {bookings.length === 0 && enquiries.length === 0 ? (
             <div className="surface-charcoal rounded-[26px] p-8 text-center text-white/60 text-xs">
               No service or space inquiries yet. Inquiries from the website will appear here.
             </div>
           ) : (
             <div className="space-y-2.5">
+              {enquiries.map((eq) => (
+                <div
+                  key={eq.id}
+                  className="surface-charcoal rounded-[22px] p-4 flex items-center justify-between gap-3 border border-[#D8FF48]/20"
+                >
+                  <div className="min-w-0">
+                    <span className="text-[10px] uppercase font-bold text-[#D8FF48] tracking-wider block">
+                      {eq.type || 'Event Enquiry'}
+                    </span>
+                    <h4 className="text-sm font-semibold text-white truncate">
+                      {eq.title || eq.name || 'Studio Enquiry'}
+                    </h4>
+                    <p className="text-xs text-white/65 mt-0.5">
+                      {eq.detail || eq.message || ''}
+                    </p>
+                    <span className="text-[11px] font-mono text-white/45 mt-1 block">
+                      {[eq.bookingCode, eq.phone, eq.email].filter(Boolean).join(' · ') || eq.createdAt}
+                    </span>
+                  </div>
+                  <span className="text-xs font-semibold text-[#D8FF48] px-2.5 py-1 rounded-full bg-[#D8FF48]/10 shrink-0">
+                    Enquiry
+                  </span>
+                </div>
+              ))}
               {bookings.map((b) => (
                 <div
                   key={b.id}

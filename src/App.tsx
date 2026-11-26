@@ -185,10 +185,7 @@ export default function App() {
       .then((res) => res.json())
       .then((data) => {
         if (data && data.events && Array.isArray(data.events) && data.events.length > 0) {
-          setEvents((prev) => {
-            const hasAmour = prev.some((e) => e.id === 'amour');
-            return sanitizeEvents(hasAmour ? prev : data.events);
-          });
+          setEvents(sanitizeEvents(data.events));
         }
         if (data?.settings?.cafeMenu && Array.isArray(data.settings.cafeMenu) && data.settings.cafeMenu.length > 0) {
           setCafeMenu(data.settings.cafeMenu);
@@ -402,6 +399,19 @@ export default function App() {
     }
     setEvents(res.events);
     setPasses(res.passes);
+    fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        eventId: res.mintedPass.eventId,
+        eventTitle: res.mintedPass.eventTitle,
+        tier: res.mintedPass.tier,
+        quantity: res.mintedPass.quantity,
+        totalAmount: res.mintedPass.totalPaid,
+        utr: params.utr,
+        status: params.status || 'confirmed',
+      }),
+    }).catch(() => {});
     setNotifications((prev) => [
       {
         id: `notif-${Date.now()}`,
@@ -452,6 +462,11 @@ export default function App() {
       return { ok: false, error: res.error };
     }
     setBookings(res.bookings);
+    fetch('/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(res.created),
+    }).catch(() => {});
     setNotifications((prev) => [
       {
         id: `notif-${Date.now()}`,
@@ -482,6 +497,16 @@ export default function App() {
       createdAt: new Date().toISOString(),
     };
     setBookings((prev) => [created, ...prev]);
+    fetch('/api/enquiries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'organise_event',
+        title: created.title,
+        detail: created.detail,
+        bookingCode: created.bookingCode,
+      }),
+    }).catch(() => {});
     setNotifications((prev) => [
       {
         id: `notif-${Date.now()}`,

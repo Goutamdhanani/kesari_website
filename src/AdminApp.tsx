@@ -41,20 +41,12 @@ export const AdminApp: React.FC = () => {
   const [failedAttempts, setFailedAttempts] = useState<number>(0);
   const [lockoutSeconds, setLockoutSeconds] = useState<number>(0);
 
-  // Studio Operations Data
-  const [events, setEvents] = useState<StudioEvent[]>(() => {
-    try {
-      const stored = window.localStorage.getItem(EVENTS_STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch {}
-    return INITIAL_EVENTS;
-  });
-
+  // Studio Operations Data (loaded from live backend /api/admin/data)
+  const [events, setEvents] = useState<StudioEvent[]>([]);
   const [passes, setPasses] = useState<TicketPass[]>([]);
   const [bookings, setBookings] = useState<StudioBooking[]>([]);
+  const [enquiries, setEnquiries] = useState<any[]>([]);
+  const [studioSettings, setStudioSettings] = useState<Record<string, any> | undefined>(undefined);
   const [artists, setArtists] = useState<Array<StudioArtist & { status?: string; phone?: string; email?: string }>>([]);
 
   // Compute live metrics
@@ -99,6 +91,12 @@ export const AdminApp: React.FC = () => {
         }
         if (data && data.bookings && Array.isArray(data.bookings)) {
           setBookings(data.bookings);
+        }
+        if (data && data.enquiries && Array.isArray(data.enquiries)) {
+          setEnquiries(data.enquiries);
+        }
+        if (data && data.settings) {
+          setStudioSettings(data.settings);
         }
         if (data && data.artists && Array.isArray(data.artists)) {
           setArtists(data.artists);
@@ -162,6 +160,8 @@ export const AdminApp: React.FC = () => {
           if (adminData && adminData.events) setEvents(adminData.events);
           if (adminData && adminData.artists) setArtists(adminData.artists);
           if (adminData && adminData.bookings) setBookings(adminData.bookings);
+          if (adminData && adminData.enquiries) setEnquiries(adminData.enquiries);
+          if (adminData && adminData.settings) setStudioSettings(adminData.settings);
           if (adminData && adminData.orders) {
             const mappedPasses: TicketPass[] = adminData.orders.map((o: any) => ({
               id: o.id,
@@ -482,6 +482,8 @@ export const AdminApp: React.FC = () => {
           metrics={metrics}
           passes={passes}
           bookings={bookings}
+          enquiries={enquiries}
+          initialSettings={studioSettings}
           artists={artists}
           onToggleLive={handleToggleEventLive}
           onDoorSale={handleDoorSale}
