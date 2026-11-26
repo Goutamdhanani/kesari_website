@@ -570,8 +570,139 @@ const DEFAULT_QR_TARGETS = {
   cafe: '/cafe',
   events: '/schedule',
   artists: '/artists/register',
+  checkin: '/checkin',
   home: '/',
 };
+
+let localCheckinPreviewCounter = 0;
+
+// Guest Check-In endpoint (compatible with Goutamdhanani/qr-checkin Google Apps Script)
+app.post('/api/checkin', async (req, res) => {
+  try {
+    const { name, phone, role, clientInfo, customWebhookUrl } = req.body || {};
+    const attendeeRole =
+      role && typeof role === 'string' && role.trim() ? role.trim() : 'Audience';
+
+    if (!name || String(name).trim().length < 2) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Please provide a valid full name.' });
+    }
+
+    if (!phone || String(phone).trim().length < 6) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Please provide a valid contact number.' });
+    }
+
+    const forwardedFor = req.headers['x-forwarded-for'];
+    const realIp = req.headers['x-real-ip'];
+    const ip = forwardedFor
+      ? String(forwardedFor).split(',')[0].trim()
+      : String(realIp || req.ip || '127.0.0.1');
+    const city = String(req.headers['x-vercel-ip-city'] || '');
+    const country = String(req.headers['x-vercel-ip-country'] || '');
+    const region = String(req.headers['x-vercel-ip-country-region'] || '');
+    const userAgent = String(req.headers['user-agent'] || '');
+
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = String(now.getFullYear()).slice(-2);
+    const serverDate = `${day}/${month}/${year}`;
+    const serverTime = now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    });
+
+    const settings = await dbService.getSettings();
+    const webhookUrl =
+      customWebhookUrl ||
+      process.env.GOOGLE_SHEET_WEBHOOK_URL ||
+      process.env.NEXT_PUBLIC_GOOGLE_SHEET_WEBHOOK_URL ||
+      settings.checkinWebhookUrl ||
+      '';
+
+    const googleSheetPayload = {
+      name: String(name).trim(),
+      phone: String(phone).trim(),
+      role: attendeeRole,
+      ip,
+      city: city ? `${city}${region ? `, ${region}` : ''}` : '',
+      country,
+      userAgent,
+      serverDate,
+      serverTime,
+      clientInfo: {
+        ...(clientInfo || {}),
+        serverRecordedAt: now.toISOString(),
+      },
+    };
+
+    if (webhookUrl && String(webhookUrl).startsWith('http')) {
+      try {
+        const sheetRes = await fetch(String(webhookUrl), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(googleSheetPayload),
+          redirect: 'follow',
+        });
+        const sheetData = await sheetRes.json();
+        if (sheetData && sheetData.success) {
+          const passId = `VN-${String(sheetData.entryNumber).padStart(4, '0')}`;
+          return res.json({
+            success: true,
+            message: 'Sign-in successfully saved to Google Sheet!',
+            entryNumber: sheetData.entryNumber,
+            dayNumber: sheetData.dayNumber,
+            slotInDay: sheetData.slotInDay,
+            eventDate: sheetData.eventDate || serverDate,
+            actualDate: sheetData.actualDate || serverDate,
+            actualTime: sheetData.actualTime || serverTime,
+            name: String(name).trim(),
+            phone: String(phone).trim(),
+            role: sheetData.role || attendeeRole,
+            passId,
+          });
+        }
+      } catch (sheetErr) {
+        console.error('Failed to forward to Google Sheets Webhook:', sheetErr);
+      }
+    }
+
+    localCheckinPreviewCounter++;
+    const simDayNumber = Math.floor((localCheckinPreviewCounter - 1) / 50) + 1;
+    const simSlot = ((localCheckinPreviewCounter - 1) % 50) + 1;
+    const passId = `DEMO-${String(localCheckinPreviewCounter).padStart(4, '0')}`;
+    const simDateObj = new Date();
+    simDateObj.setDate(simDateObj.getDate() + (simDayNumber - 1));
+    const simEventDate = `${String(simDateObj.getDate()).padStart(2, '0')}/${String(
+      simDateObj.getMonth() + 1
+    ).padStart(2, '0')}/${String(simDateObj.getFullYear()).slice(-2)}`;
+
+    return res.json({
+      success: true,
+      message: 'Check-in generated (Preview Mode)',
+      entryNumber: localCheckinPreviewCounter,
+      dayNumber: simDayNumber,
+      slotInDay: `${simSlot} / 50`,
+      eventDate: simEventDate,
+      actualDate: serverDate,
+      actualTime: serverTime,
+      name: String(name).trim(),
+      phone: String(phone).trim(),
+      role: attendeeRole,
+      passId,
+      warning: webhookUrl
+        ? 'Could not reach Google Sheets webhook. Please verify your Apps Script URL.'
+        : 'Google Sheet webhook URL not set yet. Add GOOGLE_SHEET_WEBHOOK_URL in Hostinger/.env or Admin Settings to save live rows.',
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message || 'Internal server error' });
+  }
+});
 
 // Public read of permanent QR redirect targets
 app.get('/api/qr/targets', async (req, res) => {

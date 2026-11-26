@@ -19,10 +19,12 @@ export const DEFAULT_SETTINGS = {
   phone: '+917760539955',
   address: 'Kesari - The Memory Studio, 80 Feet Rd, 4th Block, Koramangala, Bangalore, Karnataka 560034',
   whatsappUrl: 'https://wa.me/917760539955',
+  checkinWebhookUrl: process.env.GOOGLE_SHEET_WEBHOOK_URL || '',
   qrTargets: {
     cafe: '/cafe',
     events: '/schedule',
     artists: '/artists/register',
+    checkin: '/checkin',
     home: '/',
   },
 };

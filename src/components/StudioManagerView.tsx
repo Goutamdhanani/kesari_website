@@ -112,6 +112,7 @@ export const StudioManagerView: React.FC<StudioManagerViewProps> = ({
   const [phone, setPhone] = useState(KESARI_CONTACT.phone);
   const [email, setEmail] = useState(KESARI_CONTACT.email);
   const [address, setAddress] = useState(KESARI_CONTACT.fullAddress);
+  const [checkinWebhookUrl, setCheckinWebhookUrl] = useState('');
   const [settingsSaved, setSettingsSaved] = useState(false);
 
   // Backend / MongoDB Atlas Health state
@@ -213,7 +214,7 @@ export const StudioManagerView: React.FC<StudioManagerViewProps> = ({
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ upiId, payeeName, phone, email, address }),
+      body: JSON.stringify({ upiId, payeeName, phone, email, address, checkinWebhookUrl }),
     }).catch(() => {});
     setSettingsSaved(true);
     setTimeout(() => setSettingsSaved(false), 3000);
@@ -824,6 +825,19 @@ export const StudioManagerView: React.FC<StudioManagerViewProps> = ({
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   className="w-full h-10 px-3 rounded-xl bg-black/40 border border-white/15 text-white text-xs focus:outline-none focus:border-[#D8FF48]"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="text-xs text-white/70 block mb-1">
+                  Check-In Google Apps Script Webhook URL (same sheet as qr-checkin):
+                </label>
+                <input
+                  type="url"
+                  value={checkinWebhookUrl}
+                  onChange={(e) => setCheckinWebhookUrl(e.target.value)}
+                  placeholder="https://script.google.com/macros/s/AKfycb.../exec (or set GOOGLE_SHEET_WEBHOOK_URL in Hostinger)"
+                  className="w-full h-10 px-3 rounded-xl bg-black/40 border border-white/15 text-white text-xs font-mono focus:outline-none focus:border-[#D8FF48]"
                 />
               </div>
             </div>

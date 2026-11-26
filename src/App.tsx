@@ -53,6 +53,7 @@ import { PassesWalletView } from './components/PassesWalletView';
 import { ScheduleView } from './components/ScheduleView';
 import { SearchEventsView } from './components/SearchEventsView';
 import { ArtistsPage, StudioArtist } from './components/ArtistsPage';
+import { CheckInPage } from './components/CheckInPage';
 import { LiquidPrismNav, NavTab } from './components/LiquidPrismNav';
 import {
   HomeSkeleton,
@@ -106,6 +107,9 @@ function parsePathToNav(pathname: string): { tab: NavTab; subPage?: string } {
   }
   if (clean === 'qr/events') return { tab: 'schedule' };
   if (clean === 'qr/artists') return { tab: 'artists' };
+  if (clean === 'checkin' || clean === 'check-in' || clean === 'qr/checkin') {
+    return { tab: 'checkin' };
+  }
   if (clean === 'artists' || clean.startsWith('artists/')) {
     const parts = clean.split('/');
     return { tab: 'artists', subPage: parts[1] };
@@ -498,6 +502,7 @@ export default function App() {
     passes: 'Pass Wallet',
     artists: 'Artists Roster',
     menu: 'Café Menu & Order',
+    checkin: 'Guest Check-In',
     about: 'About Kesari',
     connect: 'Connect With Us',
     help: 'Help & Information',
@@ -914,6 +919,10 @@ export default function App() {
                   }
                 />
               </div>
+            )}
+
+            {activeTab === 'checkin' && (
+              <CheckInPage onBack={() => handleSelectTab('explore')} />
             )}
 
             {activeTab === 'schedule' && (

@@ -9,6 +9,7 @@ export type NavTab =
   | 'passes'
   | 'artists'
   | 'menu'
+  | 'checkin'
   | 'about'
   | 'connect'
   | 'help';

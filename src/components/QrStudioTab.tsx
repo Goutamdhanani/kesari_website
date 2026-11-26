@@ -16,12 +16,13 @@ import {
   Ticket,
 } from 'lucide-react';
 
-type QrPresetId = 'cafe' | 'events' | 'artists' | 'home' | 'custom';
+type QrPresetId = 'cafe' | 'checkin' | 'events' | 'artists' | 'home' | 'custom';
 
 const PRODUCTION_DOMAIN = 'https://www.thekesari.com';
 
 const DEFAULT_TARGETS: Record<Exclude<QrPresetId, 'custom'>, string> = {
   cafe: '/cafe',
+  checkin: '/checkin',
   events: '/schedule',
   artists: '/artists/register',
   home: '/',
@@ -42,6 +43,14 @@ const PRESETS: Array<{
     qrSlug: '/qr',
     description: 'Permanent /qr link — redirects to Café Menu (changeable anytime)',
     Icon: Coffee,
+  },
+  {
+    id: 'checkin',
+    label: 'Guest Check-In QR',
+    path: '/checkin',
+    qrSlug: '/qr/checkin',
+    description: 'Permanent /qr/checkin link — contactless Google Sheet guest sign-in',
+    Icon: Check,
   },
   {
     id: 'events',
