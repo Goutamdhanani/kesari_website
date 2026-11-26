@@ -137,9 +137,18 @@ type MenuFilter = 'all' | MenuCategoryId;
 
 interface FoodSectionProps {
   initialSeatingLocation?: string;
+  compact?: boolean;
+  onViewFullMenu?: () => void;
 }
 
-export const FoodSection: React.FC<FoodSectionProps> = ({ initialSeatingLocation = '' }) => {
+const COMPACT_SNACK_IDS = ['m1', 'm5', 'm11', 'a4', 'a7', 'si2'];
+const COMPACT_BEVERAGE_IDS = ['hb1', 'hb5', 'hb9', 'hb6', 'cb11', 'cb7'];
+
+export const FoodSection: React.FC<FoodSectionProps> = ({
+  initialSeatingLocation = '',
+  compact = false,
+  onViewFullMenu,
+}) => {
   const [filter, setFilter] = useState<MenuFilter>('all');
   const [cart, setCart] = useState<Record<string, number>>({});
   const [customerName, setCustomerName] = useState('');
@@ -336,55 +345,95 @@ export const FoodSection: React.FC<FoodSectionProps> = ({ initialSeatingLocation
           </p>
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 pl-6 sm:pl-0">
-          <button
-            type="button"
-            onClick={() => setFilter('all')}
-            className={`shrink-0 min-h-[34px] px-3 py-1 rounded-full text-xs font-medium transition-all ${
-              filter === 'all'
-                ? 'bg-white text-black font-semibold'
-                : 'bg-white/6 text-white/60 hover:text-white border border-white/8'
-            }`}
-          >
-            All ({ALL_ITEMS.length})
-          </button>
-          {MENU_CATEGORIES.map((cat) => {
-            const count = ALL_ITEMS.filter((i) => i.categoryId === cat.id).length;
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setFilter(cat.id)}
-                className={`shrink-0 min-h-[34px] px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                  filter === cat.id
-                    ? 'bg-white text-black font-semibold'
-                    : 'bg-white/6 text-white/60 hover:text-white border border-white/8'
-                }`}
-              >
-                {cat.shortLabel} ({count})
-              </button>
-            );
-          })}
-        </div>
+        {/* Filter Pills or Compact Full-Menu CTA */}
+        {compact ? (
+          onViewFullMenu && (
+            <button
+              type="button"
+              onClick={onViewFullMenu}
+              className="self-start sm:self-auto ml-6 sm:ml-0 px-3.5 py-1.5 rounded-full bg-white/8 hover:bg-white/15 border border-white/15 text-xs font-semibold text-white transition-colors"
+            >
+              Full Menu ({ALL_ITEMS.length}) &rarr;
+            </button>
+          )
+        ) : (
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 pl-6 sm:pl-0">
+            <button
+              type="button"
+              onClick={() => setFilter('all')}
+              className={`shrink-0 min-h-[34px] px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                filter === 'all'
+                  ? 'bg-white text-black font-semibold'
+                  : 'bg-white/6 text-white/60 hover:text-white border border-white/8'
+              }`}
+            >
+              All ({ALL_ITEMS.length})
+            </button>
+            {MENU_CATEGORIES.map((cat) => {
+              const count = ALL_ITEMS.filter((i) => i.categoryId === cat.id).length;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setFilter(cat.id)}
+                  className={`shrink-0 min-h-[34px] px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                    filter === cat.id
+                      ? 'bg-white text-black font-semibold'
+                      : 'bg-white/6 text-white/60 hover:text-white border border-white/8'
+                  }`}
+                >
+                  {cat.shortLabel} ({count})
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* Category Rows */}
-      {MENU_CATEGORIES.filter((cat) => filter === 'all' || filter === cat.id).map((cat) => {
-        const items = ALL_ITEMS.filter((i) => i.categoryId === cat.id);
-        return (
-          <div key={cat.id} className="space-y-2 pt-1">
+      {/* Compact Home View (1 Snacks row + 1 Beverages row) OR Full 8-Category Menu */}
+      {compact ? (
+        <>
+          <div className="space-y-2 pt-1">
             <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-semibold text-white/80">{cat.label}</span>
-              <span className="text-[11px] text-white/40">{items.length} Items</span>
+              <span className="text-xs font-semibold text-white/80">Snacks &amp; Signatures</span>
+              <span className="text-[11px] text-white/40">{COMPACT_SNACK_IDS.length} Picks</span>
             </div>
-
             <div className="flex gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory">
-              {items.map((item, index) => renderCard(item, index))}
+              {ALL_ITEMS.filter((i) => COMPACT_SNACK_IDS.includes(i.id)).map((item, index) =>
+                renderCard(item, index)
+              )}
             </div>
           </div>
-        );
-      })}
+
+          <div className="space-y-2 pt-1">
+            <div className="flex items-center justify-between px-1">
+              <span className="text-xs font-semibold text-white/80">Beverages &amp; Coffee</span>
+              <span className="text-[11px] text-white/40">{COMPACT_BEVERAGE_IDS.length} Picks</span>
+            </div>
+            <div className="flex gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory">
+              {ALL_ITEMS.filter((i) => COMPACT_BEVERAGE_IDS.includes(i.id)).map((item, index) =>
+                renderCard(item, index)
+              )}
+            </div>
+          </div>
+        </>
+      ) : (
+        MENU_CATEGORIES.filter((cat) => filter === 'all' || filter === cat.id).map((cat) => {
+          const items = ALL_ITEMS.filter((i) => i.categoryId === cat.id);
+          return (
+            <div key={cat.id} className="space-y-2 pt-1">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-xs font-semibold text-white/80">{cat.label}</span>
+                <span className="text-[11px] text-white/40">{items.length} Items</span>
+              </div>
+
+              <div className="flex gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory">
+                {items.map((item, index) => renderCard(item, index))}
+              </div>
+            </div>
+          );
+        })
+      )}
 
       {/* WhatsApp Order Details & Checkout Card */}
       <AnimatePresence>

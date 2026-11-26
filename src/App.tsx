@@ -877,7 +877,10 @@ export default function App() {
 
                 {/* Food & Extras placeholder */}
                 <div data-reveal className="will-animate">
-                  <FoodSection />
+                  <FoodSection
+                    compact
+                    onViewFullMenu={() => handleSelectTab('menu')}
+                  />
                 </div>
 
                 {/* Contact Us */}
