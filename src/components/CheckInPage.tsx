@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -8,15 +8,21 @@ import {
   ChevronUp,
   Clock,
   Layers,
-  Loader2,
   Phone,
   RotateCcw,
   Shield,
   Sparkles,
   User,
   Users,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
-import { collectAllDeviceInfo, DeviceDetails } from '../utils/collectDeviceInfo';
+import {
+  collectAllDeviceInfo,
+  DeviceDetails,
+  formatDDMMYY,
+  formatTime12h,
+} from '../utils/collectDeviceInfo';
 
 export interface CheckInResponse {
   success: boolean;
@@ -32,6 +38,37 @@ export interface CheckInResponse {
   role?: string;
   passId?: string;
   warning?: string;
+  offlinePending?: boolean;
+}
+
+interface QueuedCheckIn {
+  localId: string;
+  name: string;
+  phone: string;
+  role: 'Audience' | 'Organisers';
+  clientInfo: DeviceDetails;
+  queuedAt: string;
+}
+
+const OFFLINE_QUEUE_KEY = 'kesari_checkin_queue_v1';
+
+function loadOfflineQueue(): QueuedCheckIn[] {
+  try {
+    const raw = window.localStorage.getItem(OFFLINE_QUEUE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveOfflineQueue(items: QueuedCheckIn[]): void {
+  try {
+    window.localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(items));
+  } catch {
+    // Ignore storage quota errors
+  }
 }
 
 interface CheckInPageProps {
@@ -43,15 +80,76 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
   const [phone, setPhone] = useState('');
   const [countryCode, setCountryCode] = useState('+91');
   const [role, setRole] = useState<'Audience' | 'Organisers'>('Audience');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAutoInfo, setShowAutoInfo] = useState(false);
   const [deviceInfo, setDeviceInfo] = useState<DeviceDetails | null>(null);
   const [result, setResult] = useState<CheckInResponse | null>(null);
+  const [pendingCount, setPendingCount] = useState<number>(() =>
+    typeof window !== 'undefined' ? loadOfflineQueue().length : 0
+  );
+  const [isOnline, setIsOnline] = useState<boolean>(() =>
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+
+  const flushQueue = useCallback(async () => {
+    const queue = loadOfflineQueue();
+    if (queue.length === 0) {
+      setPendingCount(0);
+      return;
+    }
+
+    const remaining: QueuedCheckIn[] = [];
+    for (const item of queue) {
+      try {
+        const res = await fetch('/api/checkin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: item.name,
+            phone: item.phone,
+            role: item.role,
+            clientInfo: item.clientInfo,
+          }),
+          keepalive: true,
+        });
+        if (!res.ok) {
+          remaining.push(item);
+        }
+      } catch {
+        remaining.push(item);
+      }
+    }
+
+    saveOfflineQueue(remaining);
+    setPendingCount(remaining.length);
+  }, []);
 
   useEffect(() => {
     collectAllDeviceInfo().then(setDeviceInfo);
-  }, []);
+    void flushQueue();
+
+    const handleOnline = () => {
+      setIsOnline(true);
+      void flushQueue();
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    const interval = window.setInterval(() => {
+      if (navigator.onLine && loadOfflineQueue().length > 0) {
+        void flushQueue();
+      }
+    }, 15000);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      window.clearInterval(interval);
+    };
+  }, [flushQueue]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,35 +168,77 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
       return;
     }
 
-    setLoading(true);
-    try {
-      const formattedPhone = cleanPhone.startsWith('+')
-        ? cleanPhone
-        : `${countryCode} ${cleanPhone}`;
+    const formattedPhone = cleanPhone.startsWith('+')
+      ? cleanPhone
+      : `${countryCode} ${cleanPhone}`;
 
-      const freshInfo = await collectAllDeviceInfo();
+    const freshInfo = deviceInfo || (await collectAllDeviceInfo());
+    const now = new Date();
+    const actualDate = formatDDMMYY(now);
+    const actualTime = formatTime12h(now);
+    const localId = `Q-${now.getTime().toString().slice(-4)}`;
 
-      const res = await fetch('/api/checkin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: cleanName,
-          phone: formattedPhone,
-          role,
-          clientInfo: freshInfo,
-        }),
-      });
+    // 1. Show instant confirmation immediately (zero wait!)
+    setResult({
+      success: true,
+      message: navigator.onLine
+        ? 'Sent! Your check-in is confirmed.'
+        : 'Saved offline! Will sync automatically when internet returns.',
+      name: cleanName,
+      phone: formattedPhone,
+      role,
+      actualDate,
+      actualTime,
+      eventDate: actualDate,
+      passId: localId,
+      offlinePending: !navigator.onLine,
+    });
 
-      const data: CheckInResponse = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || 'Failed to complete check-in.');
+    // 2. Queue locally first so offline / weak signal never loses a guest
+    const queueItem: QueuedCheckIn = {
+      localId,
+      name: cleanName,
+      phone: formattedPhone,
+      role,
+      clientInfo: freshInfo,
+      queuedAt: now.toISOString(),
+    };
+    const nextQueue = [...loadOfflineQueue(), queueItem];
+    saveOfflineQueue(nextQueue);
+    setPendingCount(nextQueue.length);
+
+    // 3. Dispatch immediately in background
+    if (navigator.onLine) {
+      try {
+        const res = await fetch('/api/checkin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: cleanName,
+            phone: formattedPhone,
+            role,
+            clientInfo: freshInfo,
+          }),
+          keepalive: true,
+        });
+        if (res.ok) {
+          const data: CheckInResponse = await res.json();
+          const remaining = loadOfflineQueue().filter((q) => q.localId !== localId);
+          saveOfflineQueue(remaining);
+          setPendingCount(remaining.length);
+          setResult((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  ...data,
+                  offlinePending: false,
+                }
+              : data
+          );
+        }
+      } catch {
+        // Stays in localStorage queue and auto-syncs when internet is back
       }
-
-      setResult(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Network error. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -112,8 +252,8 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
 
   return (
     <section aria-label="Guest Check-In" className="space-y-5">
-      {onBack && (
-        <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
+        {onBack ? (
           <button
             type="button"
             onClick={onBack}
@@ -122,11 +262,25 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Studio</span>
           </button>
+        ) : (
+          <div />
+        )}
+        <div className="flex items-center gap-2">
+          {pendingCount > 0 && (
+            <button
+              type="button"
+              onClick={() => void flushQueue()}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-[11px] font-semibold text-amber-200"
+            >
+              {isOnline ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
+              <span>{pendingCount} pending sync</span>
+            </button>
+          )}
           <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#D8FF48]">
             Contactless Check-In
           </span>
         </div>
-      )}
+      </div>
 
       <div className="max-w-[460px] mx-auto">
         {result ? (
@@ -136,14 +290,12 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
                 <CheckCircle2 className="w-6 h-6" />
               </div>
               <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-[#D8FF48]">
-                CHECK-IN CONFIRMED
+                {result.offlinePending ? 'SAVED OFFLINE · WILL SYNC' : 'CHECK-IN SENT'}
               </p>
               <h2 className="text-2xl font-bold text-white tracking-tight">
                 Welcome, {result.name}
               </h2>
-              <p className="text-xs text-white/55">
-                {result.message}
-              </p>
+              <p className="text-xs text-white/55">{result.message}</p>
             </div>
 
             <div className="rounded-2xl bg-black/45 border border-white/10 p-4 space-y-3">
@@ -172,22 +324,6 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
               </div>
 
               <div className="grid grid-cols-2 gap-3 text-xs">
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-white/45 block">
-                    Day &amp; Slot
-                  </span>
-                  <span className="text-white font-semibold">
-                    Day {result.dayNumber || 1} · {result.slotInDay || '1 / 50'}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="text-[10px] uppercase tracking-wider text-white/45 block">
-                    Entry #
-                  </span>
-                  <span className="font-mono text-white font-semibold">
-                    #{result.entryNumber || 1}
-                  </span>
-                </div>
                 <div className="flex items-center gap-1.5 text-white/75">
                   <Calendar className="w-3.5 h-3.5 text-[#D8FF48]" />
                   <span>{result.actualDate || result.eventDate}</span>
@@ -269,7 +405,6 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
                     placeholder="Enter your full name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    disabled={loading}
                     className="w-full h-11 pl-10 pr-4 rounded-2xl bg-black/45 border border-white/15 text-sm text-white placeholder-white/35 focus:outline-none focus:border-[#D8FF48] transition-colors"
                   />
                 </div>
@@ -287,7 +422,6 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
                     <select
                       value={countryCode}
                       onChange={(e) => setCountryCode(e.target.value)}
-                      disabled={loading}
                       className="h-11 pl-3 pr-7 rounded-2xl bg-black/45 border border-white/15 text-xs font-semibold text-white focus:outline-none focus:border-[#D8FF48] appearance-none cursor-pointer"
                     >
                       <option value="+91">IN (+91)</option>
@@ -310,7 +444,6 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
                       placeholder="98765 43210"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      disabled={loading}
                       className="w-full h-11 pl-10 pr-4 rounded-2xl bg-black/45 border border-white/15 text-sm text-white font-mono placeholder-white/35 focus:outline-none focus:border-[#D8FF48] transition-colors"
                     />
                   </div>
@@ -351,20 +484,10 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
 
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full h-12 rounded-full bg-[#D8FF48] hover:bg-[#C8EE38] disabled:opacity-60 text-[#07070A] text-sm font-bold flex items-center justify-center gap-2 transition-colors mt-2"
+                className="w-full h-12 rounded-full bg-[#D8FF48] hover:bg-[#C8EE38] text-[#07070A] text-sm font-bold flex items-center justify-center gap-2 transition-colors mt-2"
               >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Checking In...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Confirm Check-In</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
+                <span>Confirm Check-In</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </form>
 

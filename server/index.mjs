@@ -575,8 +575,44 @@ const DEFAULT_QR_TARGETS = {
 };
 
 let localCheckinPreviewCounter = 0;
+const checkinWebhookQueue = [];
+let checkinWorkerRunning = false;
 
-// Guest Check-In endpoint (compatible with Goutamdhanani/qr-checkin Google Apps Script)
+async function processCheckinQueue() {
+  if (checkinWorkerRunning) return;
+  checkinWorkerRunning = true;
+
+  try {
+    while (checkinWebhookQueue.length > 0) {
+      const job = checkinWebhookQueue[0];
+      try {
+        const sheetRes = await fetch(String(job.webhookUrl), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(job.payload),
+          redirect: 'follow',
+          signal: AbortSignal.timeout(15000),
+        });
+        await sheetRes.text();
+        checkinWebhookQueue.shift();
+      } catch (err) {
+        job.attempts = (job.attempts || 0) + 1;
+        if (job.attempts >= 3) {
+          console.error('Check-in webhook failed after 3 attempts:', err?.message || err);
+          checkinWebhookQueue.shift();
+        } else {
+          // Wait briefly before retrying so we don't hammer Apps Script
+          await new Promise((r) => setTimeout(r, 1500));
+        }
+      }
+    }
+  } finally {
+    checkinWorkerRunning = false;
+  }
+}
+
+// Guest Check-In endpoint: responds immediately and forwards sequentially in background
+// so multiple simultaneous guests never stall or collide on Apps Script locks.
 app.post('/api/checkin', async (req, res) => {
   try {
     const { name, phone, role, clientInfo, customWebhookUrl } = req.body || {};
@@ -641,63 +677,51 @@ app.post('/api/checkin', async (req, res) => {
       },
     };
 
-    if (webhookUrl && String(webhookUrl).startsWith('http')) {
-      try {
-        const sheetRes = await fetch(String(webhookUrl), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(googleSheetPayload),
-          redirect: 'follow',
-        });
-        const sheetData = await sheetRes.json();
-        if (sheetData && sheetData.success) {
-          const passId = `VN-${String(sheetData.entryNumber).padStart(4, '0')}`;
-          return res.json({
-            success: true,
-            message: 'Sign-in successfully saved to Google Sheet!',
-            entryNumber: sheetData.entryNumber,
-            dayNumber: sheetData.dayNumber,
-            slotInDay: sheetData.slotInDay,
-            eventDate: sheetData.eventDate || serverDate,
-            actualDate: sheetData.actualDate || serverDate,
-            actualTime: sheetData.actualTime || serverTime,
-            name: String(name).trim(),
-            phone: String(phone).trim(),
-            role: sheetData.role || attendeeRole,
-            passId,
-          });
-        }
-      } catch (sheetErr) {
-        console.error('Failed to forward to Google Sheets Webhook:', sheetErr);
-      }
-    }
-
     localCheckinPreviewCounter++;
-    const simDayNumber = Math.floor((localCheckinPreviewCounter - 1) / 50) + 1;
-    const simSlot = ((localCheckinPreviewCounter - 1) % 50) + 1;
-    const passId = `DEMO-${String(localCheckinPreviewCounter).padStart(4, '0')}`;
-    const simDateObj = new Date();
-    simDateObj.setDate(simDateObj.getDate() + (simDayNumber - 1));
-    const simEventDate = `${String(simDateObj.getDate()).padStart(2, '0')}/${String(
-      simDateObj.getMonth() + 1
-    ).padStart(2, '0')}/${String(simDateObj.getFullYear()).slice(-2)}`;
+    const entryNumber = localCheckinPreviewCounter;
+    const dayNumber = Math.floor((entryNumber - 1) / 50) + 1;
+    const slotInDay = `${((entryNumber - 1) % 50) + 1} / 50`;
+
+    if (webhookUrl && String(webhookUrl).startsWith('http')) {
+      checkinWebhookQueue.push({
+        webhookUrl: String(webhookUrl),
+        payload: googleSheetPayload,
+        attempts: 0,
+      });
+      void processCheckinQueue();
+
+      return res.json({
+        success: true,
+        queued: true,
+        message: 'Checked in! Syncing to Google Sheet in background.',
+        entryNumber,
+        dayNumber,
+        slotInDay,
+        eventDate: serverDate,
+        actualDate: serverDate,
+        actualTime: serverTime,
+        name: String(name).trim(),
+        phone: String(phone).trim(),
+        role: attendeeRole,
+        passId: `VN-${String(entryNumber).padStart(4, '0')}`,
+      });
+    }
 
     return res.json({
       success: true,
       message: 'Check-in generated (Preview Mode)',
-      entryNumber: localCheckinPreviewCounter,
-      dayNumber: simDayNumber,
-      slotInDay: `${simSlot} / 50`,
-      eventDate: simEventDate,
+      entryNumber,
+      dayNumber,
+      slotInDay,
+      eventDate: serverDate,
       actualDate: serverDate,
       actualTime: serverTime,
       name: String(name).trim(),
       phone: String(phone).trim(),
       role: attendeeRole,
-      passId,
-      warning: webhookUrl
-        ? 'Could not reach Google Sheets webhook. Please verify your Apps Script URL.'
-        : 'Google Sheet webhook URL not set yet. Add GOOGLE_SHEET_WEBHOOK_URL in Hostinger/.env or Admin Settings to save live rows.',
+      passId: `DEMO-${String(entryNumber).padStart(4, '0')}`,
+      warning:
+        'Google Sheet webhook URL not set yet. Add GOOGLE_SHEET_WEBHOOK_URL in Hostinger/.env or Admin Settings to save live rows.',
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message || 'Internal server error' });
