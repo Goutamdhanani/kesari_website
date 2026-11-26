@@ -97,50 +97,41 @@ export const FoodSection: React.FC<FoodSectionProps> = ({ initialSeatingLocation
   const totalItemsCount = cartEntries.reduce((sum, it) => sum + it.qty, 0);
   const totalAmount = cartEntries.reduce((sum, it) => sum + it.itemTotal, 0);
 
+  const buildWhatsAppMessage = () => {
+    const itemsListText = cartEntries
+      .map((item) => `• ${item.qty}x ${item.name} - ₹${item.itemTotal}`)
+      .join('\n');
+
+    return [
+      `*KESARI CAFE ORDER*`,
+      customerName.trim() ? `*Name:* ${customerName.trim()}` : null,
+      customerPhone.trim() ? `*Phone:* ${customerPhone.trim()}` : null,
+      seatingLocation.trim() ? `*Table / Seating:* ${seatingLocation.trim()}` : null,
+      `---------------------------------`,
+      itemsListText,
+      `---------------------------------`,
+      `*Total:* ₹${totalAmount}`,
+      specialNote.trim() ? `*Note:* ${specialNote.trim()}` : null,
+      `Please confirm my order.`,
+    ]
+      .filter(Boolean)
+      .join('\n');
+  };
+
+  const whatsappUrl =
+    cartEntries.length > 0
+      ? `https://wa.me/${CAFE_WHATSAPP_NUMBER}?text=${encodeURIComponent(buildWhatsAppMessage())}`
+      : '';
+
   const handleSendWhatsAppOrder = (e: React.FormEvent) => {
     e.preventDefault();
     if (cartEntries.length === 0) {
       setFormError('Please add at least one item to order.');
       return;
     }
-    if (!customerName.trim()) {
-      setFormError('Please enter your name.');
-      return;
-    }
-    if (!customerPhone.trim() || customerPhone.replace(/\D/g, '').length < 10) {
-      setFormError('Please enter a valid 10-digit phone number.');
-      return;
-    }
 
     setFormError(null);
-
-    // Format WhatsApp Message
-    const itemsListText = cartEntries
-      .map((item) => `• ${item.qty}x ${item.name} - ₹${item.itemTotal}`)
-      .join('\n');
-
-    const message = [
-      `*KESARI CAFE ORDER* ☕🍽️`,
-      `---------------------------------`,
-      `*Name:* ${customerName.trim()}`,
-      `*Phone:* ${customerPhone.trim()}`,
-      seatingLocation.trim() ? `*Table / Seating:* ${seatingLocation.trim()}` : null,
-      `---------------------------------`,
-      `*Order Items:*`,
-      itemsListText,
-      `---------------------------------`,
-      `*Total Amount:* ₹${totalAmount}`,
-      specialNote.trim() ? `*Note:* ${specialNote.trim()}` : null,
-      `---------------------------------`,
-      `Please prepare my order. Thank you!`,
-    ]
-      .filter(Boolean)
-      .join('\n');
-
-    const whatsappUrl = `https://wa.me/${CAFE_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-
-    // Open WhatsApp
-    window.open(whatsappUrl, '_blank');
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
     setOrderSent(true);
   };
 
@@ -412,11 +403,10 @@ export const FoodSection: React.FC<FoodSectionProps> = ({ initialSeatingLocation
                 <div className="space-y-1">
                   <label className="text-[11px] font-medium text-white/70 flex items-center gap-1.5">
                     <User size={12} className="text-white/40" />
-                    <span>Your Name *</span>
+                    <span>Your Name (Optional)</span>
                   </label>
                   <input
                     type="text"
-                    required
                     placeholder="Enter your name"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
@@ -427,11 +417,10 @@ export const FoodSection: React.FC<FoodSectionProps> = ({ initialSeatingLocation
                 <div className="space-y-1">
                   <label className="text-[11px] font-medium text-white/70 flex items-center gap-1.5">
                     <Phone size={12} className="text-white/40" />
-                    <span>Phone Number *</span>
+                    <span>Phone Number (Optional)</span>
                   </label>
                   <input
                     type="tel"
-                    required
                     placeholder="10-digit mobile number"
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
@@ -488,9 +477,49 @@ export const FoodSection: React.FC<FoodSectionProps> = ({ initialSeatingLocation
               </button>
 
               <p className="text-[11px] text-center text-white/50">
-                Clicking will open WhatsApp with your name, phone, item list, and total (₹{totalAmount}) pre-formatted.
+                Opens WhatsApp with your items (e.g. 2x Coffee) and total (₹{totalAmount}) pre-filled — just tap Send.
               </p>
             </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Sticky 1-Tap Cart & WhatsApp Bar */}
+      <AnimatePresence>
+        {totalItemsCount > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] max-w-xl rounded-2xl bg-[#0D1310]/95 backdrop-blur-xl border border-[#22C55E]/40 px-4 py-3 shadow-[0_12px_36px_rgba(0,0,0,0.75)] flex items-center justify-between gap-3"
+          >
+            <button
+              type="button"
+              onClick={() =>
+                document
+                  .getElementById(orderSectionId)
+                  ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+              }
+              className="text-left min-w-0 flex-1"
+            >
+              <div className="text-xs font-bold text-white truncate">
+                {totalItemsCount} {totalItemsCount === 1 ? 'item' : 'items'} ·{' '}
+                <span className="text-[#D8FF48]">₹{totalAmount}</span>
+              </div>
+              <div className="text-[11px] text-white/60 truncate">
+                {cartEntries.map((i) => `${i.qty}x ${i.name}`).join(', ')}
+              </div>
+            </button>
+
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 h-10 px-4 rounded-xl bg-[#22C55E] hover:bg-[#1ea850] text-black text-xs font-bold inline-flex items-center gap-1.5 shadow-[0_0_16px_rgba(34,197,94,0.35)] transition-colors"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Send on WhatsApp</span>
+            </a>
           </motion.div>
         )}
       </AnimatePresence>
