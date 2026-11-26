@@ -16,41 +16,124 @@ import {
   MapPin,
 } from 'lucide-react';
 
+export type MenuCategoryId =
+  | 'mains'
+  | 'bites'
+  | 'hot-beverages'
+  | 'cold-beverages'
+  | 'south-indian'
+  | 'rice-specials'
+  | 'healthy'
+  | 'soups';
+
 export interface MenuItem {
   id: string;
   name: string;
-  category: 'Food' | 'Beverages';
+  category: string;
+  categoryId: MenuCategoryId;
   price: number;
   badge?: string;
 }
 
-const FOOD_ITEMS: MenuItem[] = [
-  { id: 'f1', name: 'Dosa with Chutney', category: 'Food', price: 100, badge: 'Popular' },
-  { id: 'f2', name: 'Mini Idli with Sam Dip', category: 'Food', price: 180 },
-  { id: 'f3', name: 'Pav Bhaji', category: 'Food', price: 220, badge: 'Chef Special' },
-  { id: 'f4', name: 'French Fries', category: 'Food', price: 220 },
-  { id: 'f5', name: 'Veg Cheese Sandwich', category: 'Food', price: 180 },
-  { id: 'f6', name: 'Loaded Nachos', category: 'Food', price: 220 },
-  { id: 'f7', name: 'Mac n Cheese Pasta', category: 'Food', price: 220 },
-  { id: 'f8', name: 'Dahi Papdi Chat', category: 'Food', price: 180 },
-  { id: 'f9', name: 'Kurkure Chat', category: 'Food', price: 150 },
-  { id: 'f10', name: 'Moong Dal Bhaji', category: 'Food', price: 200 },
+const MENU_CATEGORIES: Array<{
+  id: MenuCategoryId;
+  label: string;
+  shortLabel: string;
+  isBeverage?: boolean;
+}> = [
+  { id: 'mains', label: 'Mains / Signatures', shortLabel: 'Mains' },
+  { id: 'bites', label: 'Appetizers & Quick Bites', shortLabel: 'Quick Bites' },
+  { id: 'hot-beverages', label: 'Hot Beverages', shortLabel: 'Hot Brews', isBeverage: true },
+  { id: 'cold-beverages', label: 'Cold Beverages & Drinks', shortLabel: 'Cold Drinks', isBeverage: true },
+  { id: 'south-indian', label: 'South Indian', shortLabel: 'South Indian' },
+  { id: 'rice-specials', label: 'Indian & Rice Specials', shortLabel: 'Rice Specials' },
+  { id: 'healthy', label: 'Healthy / Protein Options', shortLabel: 'Healthy' },
+  { id: 'soups', label: 'Soups', shortLabel: 'Soups' },
 ];
 
-const BEVERAGE_ITEMS: MenuItem[] = [
-  { id: 'b1', name: 'Coffee', category: 'Beverages', price: 120 },
-  { id: 'b2', name: 'Black Coffee', category: 'Beverages', price: 120 },
-  { id: 'b3', name: 'Hazelnut Coffee', category: 'Beverages', price: 160, badge: 'Signature' },
-  { id: 'b4', name: 'Vanilla Coffee', category: 'Beverages', price: 150 },
-  { id: 'b5', name: 'Cold Coffee', category: 'Beverages', price: 220, badge: 'Best Seller' },
-  { id: 'b6', name: 'Adrak Tea', category: 'Beverages', price: 120 },
+export const ALL_ITEMS: MenuItem[] = [
+  // 1. Mains / Signatures
+  { id: 'm1', name: 'Mac n Cheese Macaroni', category: 'Mains', categoryId: 'mains', price: 220, badge: 'Popular' },
+  { id: 'm2', name: 'Mac n Cheese Macaroni with Vegetable', category: 'Mains', categoryId: 'mains', price: 240 },
+  { id: 'm3', name: 'White Sauce Pasta with Mushroom', category: 'Mains', categoryId: 'mains', price: 240 },
+  { id: 'm4', name: 'Red Sauce Pasta', category: 'Mains', categoryId: 'mains', price: 220 },
+  { id: 'm5', name: 'Loaded Nachos', category: 'Mains', categoryId: 'mains', price: 220 },
+  { id: 'm6', name: 'Onion Toast Sandwich', category: 'Mains', categoryId: 'mains', price: 120 },
+  { id: 'm7', name: 'Grilled Colossal Sandwich (Set of 2)', category: 'Mains', categoryId: 'mains', price: 180 },
+  { id: 'm8', name: 'Plain Colossal Sandwich (Set of 2)', category: 'Mains', categoryId: 'mains', price: 140 },
+  { id: 'm9', name: 'Bombay Style Cheese Sandwich', category: 'Mains', categoryId: 'mains', price: 100 },
+  { id: 'm10', name: 'Veg Grilled Sandwich Double', category: 'Mains', categoryId: 'mains', price: 220 },
+  { id: 'm11', name: 'Pav Bhaji', category: 'Mains', categoryId: 'mains', price: 220, badge: 'Chef Special' },
+  { id: 'm12', name: 'Extra Bread (2 pcs)', category: 'Mains', categoryId: 'mains', price: 60 },
+
+  // 2. Appetizers & Quick Bites
+  { id: 'a1', name: 'Maska Bun / Jam', category: 'Quick Bites', categoryId: 'bites', price: 80 },
+  { id: 'a2', name: 'Nutrella Toast', category: 'Quick Bites', categoryId: 'bites', price: 100 },
+  { id: 'a3', name: 'French Fries (Salted)', category: 'Quick Bites', categoryId: 'bites', price: 145 },
+  { id: 'a4', name: 'French Fries (Peri Peri)', category: 'Quick Bites', categoryId: 'bites', price: 170, badge: 'Popular' },
+  { id: 'a5', name: 'Potato Bites', category: 'Quick Bites', categoryId: 'bites', price: 120 },
+  { id: 'a6', name: 'Maggi Plain', category: 'Quick Bites', categoryId: 'bites', price: 120 },
+  { id: 'a7', name: 'Cheese Maggi', category: 'Quick Bites', categoryId: 'bites', price: 150 },
+  { id: 'a8', name: 'Atta Maggi Noodles', category: 'Quick Bites', categoryId: 'bites', price: 120 },
+  { id: 'a9', name: 'Cheese Nachos', category: 'Quick Bites', categoryId: 'bites', price: 150 },
+  { id: 'a10', name: 'Classic Nachos with Dip', category: 'Quick Bites', categoryId: 'bites', price: 150 },
+  { id: 'a11', name: 'Kurkure Chaat', category: 'Quick Bites', categoryId: 'bites', price: 120 },
+  { id: 'a12', name: 'Corn Pizza Toast', category: 'Quick Bites', categoryId: 'bites', price: 180 },
+  { id: 'a13', name: 'Paneer Pizza Toast', category: 'Quick Bites', categoryId: 'bites', price: 180 },
+  { id: 'a14', name: 'Popcorn', category: 'Quick Bites', categoryId: 'bites', price: 80 },
+  { id: 'a15', name: 'Corn Palak Buns', category: 'Quick Bites', categoryId: 'bites', price: 180 },
+
+  // 3. Hot Beverages
+  { id: 'hb1', name: 'Masala Tea with Parle G', category: 'Hot Beverages', categoryId: 'hot-beverages', price: 80, badge: 'Classic' },
+  { id: 'hb2', name: 'Pudina Tea', category: 'Hot Beverages', categoryId: 'hot-beverages', price: 80 },
+  { id: 'hb3', name: 'Adrak Tea', category: 'Hot Beverages', categoryId: 'hot-beverages', price: 80 },
+  { id: 'hb4', name: 'Lemon Honey Tea', category: 'Hot Beverages', categoryId: 'hot-beverages', price: 80 },
+  { id: 'hb5', name: 'Hot Coffee', category: 'Hot Beverages', categoryId: 'hot-beverages', price: 80 },
+  { id: 'hb6', name: 'Classic Latte', category: 'Hot Beverages', categoryId: 'hot-beverages', price: 140 },
+  { id: 'hb7', name: 'Vanilla Latte', category: 'Hot Beverages', categoryId: 'hot-beverages', price: 140 },
+  { id: 'hb8', name: 'Butterscotch Latte', category: 'Hot Beverages', categoryId: 'hot-beverages', price: 140 },
+  { id: 'hb9', name: 'Hazelnut Latte', category: 'Hot Beverages', categoryId: 'hot-beverages', price: 160, badge: 'Signature' },
+  { id: 'hb10', name: 'Boost with Parle G', category: 'Hot Beverages', categoryId: 'hot-beverages', price: 80 },
+
+  // 4. Cold Beverages & Energy Drinks
+  { id: 'cb1', name: 'Glass Soft Drink (200 ml)', category: 'Cold Beverages', categoryId: 'cold-beverages', price: 15 },
+  { id: 'cb2', name: 'Plastic Soft Drink (250 ml)', category: 'Cold Beverages', categoryId: 'cold-beverages', price: 20 },
+  { id: 'cb3', name: 'Diet Coke Can (300 ml)', category: 'Cold Beverages', categoryId: 'cold-beverages', price: 40 },
+  { id: 'cb4', name: 'Thumbs Up Can', category: 'Cold Beverages', categoryId: 'cold-beverages', price: 40 },
+  { id: 'cb5', name: 'Coca-Cola Can', category: 'Cold Beverages', categoryId: 'cold-beverages', price: 40 },
+  { id: 'cb6', name: 'Fanta Can', category: 'Cold Beverages', categoryId: 'cold-beverages', price: 40 },
+  { id: 'cb7', name: 'Monster (Green)', category: 'Cold Beverages', categoryId: 'cold-beverages', price: 125 },
+  { id: 'cb8', name: 'Schweppes', category: 'Cold Beverages', categoryId: 'cold-beverages', price: 60 },
+  { id: 'cb9', name: 'Predator', category: 'Cold Beverages', categoryId: 'cold-beverages', price: 60 },
+  { id: 'cb10', name: 'Masala Thumbs Up', category: 'Cold Beverages', categoryId: 'cold-beverages', price: 100 },
+  { id: 'cb11', name: 'Coke Float', category: 'Cold Beverages', categoryId: 'cold-beverages', price: 140, badge: 'Best Seller' },
+
+  // 5. South Indian
+  { id: 'si1', name: 'Plain Dosa', category: 'South Indian', categoryId: 'south-indian', price: 100 },
+  { id: 'si2', name: 'Masala Dosa with Chutney', category: 'South Indian', categoryId: 'south-indian', price: 120, badge: 'Popular' },
+  { id: 'si3', name: 'Pudi Masala Dosa', category: 'South Indian', categoryId: 'south-indian', price: 140 },
+  { id: 'si4', name: 'Podi Onion Masala Dosa', category: 'South Indian', categoryId: 'south-indian', price: 150 },
+
+  // 6. Indian & Rice Specials
+  { id: 'rs1', name: 'Italian Rice with Paneer Gravy', category: 'Rice Specials', categoryId: 'rice-specials', price: 255, badge: 'Chef Special' },
+  { id: 'rs2', name: 'Puliogere Rice', category: 'Rice Specials', categoryId: 'rice-specials', price: 180 },
+
+  // 7. Healthy / Protein Options
+  { id: 'h1', name: 'Protein Paneer Chilla (Set of 2)', category: 'Healthy', categoryId: 'healthy', price: 200, badge: 'High Protein' },
+  { id: 'h2', name: 'Besan Chilla (Set of 2)', category: 'Healthy', categoryId: 'healthy', price: 180 },
+  { id: 'h3', name: 'Ragi Chilla with Beetroot Raita', category: 'Healthy', categoryId: 'healthy', price: 225 },
+  { id: 'h4', name: 'Aloo Paratha', category: 'Healthy', categoryId: 'healthy', price: 100 },
+
+  // 8. Soups
+  { id: 's1', name: 'Tomato Soup', category: 'Soups', categoryId: 'soups', price: 80 },
+  { id: 's2', name: 'Sweet Corn Soup', category: 'Soups', categoryId: 'soups', price: 100 },
+  { id: 's3', name: 'Hot & Sour Soup', category: 'Soups', categoryId: 'soups', price: 100 },
 ];
 
-export const ALL_ITEMS = [...FOOD_ITEMS, ...BEVERAGE_ITEMS];
 export const CAFE_MENU_ITEMS = ALL_ITEMS;
-const CAFE_WHATSAPP_NUMBER = '91779577263'; // Target: 77957 77263
+const CAFE_WHATSAPP_NUMBER = '917795777263'; // Target: 77957 77263
 
-type MenuFilter = 'all' | 'food' | 'beverages';
+type MenuFilter = 'all' | MenuCategoryId;
 
 interface FoodSectionProps {
   initialSeatingLocation?: string;
@@ -137,7 +220,8 @@ export const FoodSection: React.FC<FoodSectionProps> = ({ initialSeatingLocation
 
   const renderCard = (item: MenuItem, index: number) => {
     const qty = cart[item.id] || 0;
-    const isBeverage = item.category === 'Beverages';
+    const isBeverage =
+      item.categoryId === 'hot-beverages' || item.categoryId === 'cold-beverages';
 
     return (
       <motion.div
@@ -253,70 +337,54 @@ export const FoodSection: React.FC<FoodSectionProps> = ({ initialSeatingLocation
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 pl-6 sm:pl-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 pl-6 sm:pl-0">
           <button
             type="button"
             onClick={() => setFilter('all')}
-            className={`min-h-[34px] px-3 py-1 rounded-full text-xs font-medium transition-all ${
+            className={`shrink-0 min-h-[34px] px-3 py-1 rounded-full text-xs font-medium transition-all ${
               filter === 'all'
                 ? 'bg-white text-black font-semibold'
                 : 'bg-white/6 text-white/60 hover:text-white border border-white/8'
             }`}
           >
-            All ({FOOD_ITEMS.length + BEVERAGE_ITEMS.length})
+            All ({ALL_ITEMS.length})
           </button>
-          <button
-            type="button"
-            onClick={() => setFilter('food')}
-            className={`min-h-[34px] px-3 py-1 rounded-full text-xs font-medium transition-all ${
-              filter === 'food'
-                ? 'bg-white text-black font-semibold'
-                : 'bg-white/6 text-white/60 hover:text-white border border-white/8'
-            }`}
-          >
-            Food ({FOOD_ITEMS.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setFilter('beverages')}
-            className={`min-h-[34px] px-3 py-1 rounded-full text-xs font-medium transition-all ${
-              filter === 'beverages'
-                ? 'bg-white text-black font-semibold'
-                : 'bg-white/6 text-white/60 hover:text-white border border-white/8'
-            }`}
-          >
-            Brews ({BEVERAGE_ITEMS.length})
-          </button>
+          {MENU_CATEGORIES.map((cat) => {
+            const count = ALL_ITEMS.filter((i) => i.categoryId === cat.id).length;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setFilter(cat.id)}
+                className={`shrink-0 min-h-[34px] px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  filter === cat.id
+                    ? 'bg-white text-black font-semibold'
+                    : 'bg-white/6 text-white/60 hover:text-white border border-white/8'
+                }`}
+              >
+                {cat.shortLabel} ({count})
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Row 1: Food & Kitchen Bites */}
-      {(filter === 'all' || filter === 'food') && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between px-1">
-            <span className="text-xs font-semibold text-white/80">Food &amp; Snacks</span>
-            <span className="text-[11px] text-white/40">10 Items</span>
-          </div>
+      {/* Category Rows */}
+      {MENU_CATEGORIES.filter((cat) => filter === 'all' || filter === cat.id).map((cat) => {
+        const items = ALL_ITEMS.filter((i) => i.categoryId === cat.id);
+        return (
+          <div key={cat.id} className="space-y-2 pt-1">
+            <div className="flex items-center justify-between px-1">
+              <span className="text-xs font-semibold text-white/80">{cat.label}</span>
+              <span className="text-[11px] text-white/40">{items.length} Items</span>
+            </div>
 
-          <div className="flex gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory">
-            {FOOD_ITEMS.map((item, index) => renderCard(item, index))}
+            <div className="flex gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory">
+              {items.map((item, index) => renderCard(item, index))}
+            </div>
           </div>
-        </div>
-      )}
-
-      {/* Row 2: Specialty Beverages & Coffee */}
-      {(filter === 'all' || filter === 'beverages') && (
-        <div className="space-y-2 pt-1">
-          <div className="flex items-center justify-between px-1">
-            <span className="text-xs font-semibold text-white/80">Beverages &amp; Coffee</span>
-            <span className="text-[11px] text-white/40">6 Items</span>
-          </div>
-
-          <div className="flex gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory">
-            {BEVERAGE_ITEMS.map((item, index) => renderCard(item, index))}
-          </div>
-        </div>
-      )}
+        );
+      })}
 
       {/* WhatsApp Order Details & Checkout Card */}
       <AnimatePresence>
