@@ -259,7 +259,7 @@ class DatabaseService {
       console.warn('[DB] Failed reading local cache, re-initializing defaults.', err.message);
     }
     return {
-      events: DEFAULT_EVENTS,
+      events: [],
       artists: [],
       orders: [],
       bookings: [],
@@ -291,11 +291,8 @@ class DatabaseService {
         this.isUsingMongo = true;
         console.log(`[DB] Connected successfully to MongoDB Atlas (${dbName})!`);
 
-        // Seed initial collections if empty
-        const eventsCount = await this.mongoDb.collection('events').countDocuments();
-        if (eventsCount === 0) {
-          console.log('[DB] Seeding MongoDB Atlas events with Kesari Studio catalog...');
-          await this.mongoDb.collection('events').insertMany(DEFAULT_EVENTS);
+        const existingSettings = await this.mongoDb.collection('settings').findOne({ _id: 'main' });
+        if (!existingSettings) {
           await this.mongoDb.collection('settings').insertOne({ ...DEFAULT_SETTINGS, _id: 'main' });
         }
       } catch (err) {

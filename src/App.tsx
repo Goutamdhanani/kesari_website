@@ -153,7 +153,7 @@ export default function App() {
     parsePathToNav(typeof window !== 'undefined' ? window.location.pathname : '')
   );
   const [events, setEvents] = useState<StudioEvent[]>(() =>
-    sanitizeEvents(loadStoredArray(EVENTS_STORAGE_KEY, INITIAL_EVENTS))
+    sanitizeEvents(loadStoredArray(EVENTS_STORAGE_KEY, []))
   );
   const [artists, setArtists] = useState<StudioArtist[]>(() =>
     loadStoredArray('kesari_artists_v1', [])
@@ -163,20 +163,18 @@ export default function App() {
     initialNav.subPage === 'register' ? 'register' : 'directory'
   );
   const [passes, setPasses] = useState<TicketPass[]>(() =>
-    loadStoredArray(PASSES_STORAGE_KEY, INITIAL_PASSES)
+    loadStoredArray(PASSES_STORAGE_KEY, [])
   );
   const [bookings, setBookings] = useState<StudioBooking[]>(() =>
     loadStoredArray(BOOKINGS_STORAGE_KEY, [])
   );
   const [savedIds, setSavedIds] = useState<string[]>(() =>
-    loadStoredArray(SAVED_STORAGE_KEY, ['amour', 'soundwaves'])
+    loadStoredArray(SAVED_STORAGE_KEY, [])
   );
   const [prefs, setPrefs] = useState<{ gateReminders: boolean; dropAlerts: boolean }>(
     () => loadStoredPrefs()
   );
-  const [notifications, setNotifications] = useState<StudioNotification[]>(
-    INITIAL_NOTIFICATIONS
-  );
+  const [notifications, setNotifications] = useState<StudioNotification[]>([]);
   const [cafeMenu, setCafeMenu] = useState<MenuItem[] | undefined>(undefined);
 
   useEffect(() => {
@@ -184,7 +182,7 @@ export default function App() {
     fetch('/api/content')
       .then((res) => res.json())
       .then((data) => {
-        if (data && data.events && Array.isArray(data.events) && data.events.length > 0) {
+        if (data && Array.isArray(data.events)) {
           setEvents(sanitizeEvents(data.events));
         }
         if (data?.settings?.cafeMenu && Array.isArray(data.settings.cafeMenu) && data.settings.cafeMenu.length > 0) {
