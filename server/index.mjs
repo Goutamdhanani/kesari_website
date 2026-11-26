@@ -353,14 +353,23 @@ app.post('/api/artists/register', async (req, res) => {
   }
 });
 
+const activeAdminTokens = new Set();
+
+function safeComparePassword(input, expected) {
+  const a = Buffer.from(String(input || ''), 'utf8');
+  const b = Buffer.from(String(expected || ''), 'utf8');
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
+}
+
 // Admin Authentication Middleware
 function requireAdminAuth(req, res, next) {
   const authHeader = req.headers.authorization || req.headers['x-admin-key'];
   if (!authHeader) {
     return res.status(401).json({ ok: false, error: 'Unauthorized: Admin authentication token required.' });
   }
-  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
-  if (token !== 'kesari-admin-authenticated' && token !== ADMIN_PASSWORD) {
+  const token = String(authHeader).replace(/^Bearer\s+/i, '').trim();
+  if (!activeAdminTokens.has(token) && !safeComparePassword(token, ADMIN_PASSWORD)) {
     return res.status(403).json({ ok: false, error: 'Forbidden: Invalid or expired admin token.' });
   }
   next();
@@ -374,11 +383,20 @@ app.use('/api/admin', (req, res, next) => {
 
 // Admin Authentication
 app.post('/api/admin/login', (req, res) => {
-  const { password } = req.body;
-  if (password === ADMIN_PASSWORD) {
-    return res.json({ ok: true, token: 'kesari-admin-authenticated' });
+  const { password } = req.body || {};
+  if (safeComparePassword(password, ADMIN_PASSWORD)) {
+    const token = crypto.randomBytes(32).toString('hex');
+    activeAdminTokens.add(token);
+    return res.json({ ok: true, token });
   }
   return res.status(401).json({ ok: false, error: 'Incorrect studio admin password' });
+});
+
+app.post('/api/admin/logout', (req, res) => {
+  const authHeader = req.headers.authorization || '';
+  const token = String(authHeader).replace(/^Bearer\s+/i, '').trim();
+  if (token) activeAdminTokens.delete(token);
+  res.json({ ok: true });
 });
 
 // Admin Dashboard Data

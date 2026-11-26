@@ -231,9 +231,13 @@ export const QrStudioTab: React.FC = () => {
     setSavingTarget(true);
     setTargetSavedMsg('');
     try {
+      const token = window.sessionStorage.getItem('kesari_admin_token');
       const res = await fetch('/api/admin/settings', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ qrTargets }),
       });
       const data = await res.json();

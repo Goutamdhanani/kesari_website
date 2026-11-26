@@ -160,6 +160,8 @@ export const AdminApp: React.FC = () => {
           });
           const adminData = await dataRes.json();
           if (adminData && adminData.events) setEvents(adminData.events);
+          if (adminData && adminData.artists) setArtists(adminData.artists);
+          if (adminData && adminData.bookings) setBookings(adminData.bookings);
           if (adminData && adminData.orders) {
             const mappedPasses: TicketPass[] = adminData.orders.map((o: any) => ({
               id: o.id,
@@ -188,21 +190,20 @@ export const AdminApp: React.FC = () => {
         }
       }
     } catch {
-      // Fallback local verification if server is unreachable
-      if (trimmed === 'kesari2026') {
-        window.sessionStorage.setItem(AUTH_STORAGE_KEY, 'kesari-admin-authenticated');
-        setIsAuthenticated(true);
-        setPasswordInput('');
-        setFailedAttempts(0);
-      } else {
-        setLoginError('Access Denied: Incorrect password.');
-      }
+      setLoginError('Cannot reach studio server. Please verify the backend is running.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleLogout = () => {
+    const token = window.sessionStorage.getItem(AUTH_STORAGE_KEY);
+    if (token) {
+      fetch('/api/admin/logout', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => {});
+    }
     window.sessionStorage.removeItem(AUTH_STORAGE_KEY);
     setIsAuthenticated(false);
     setPasswordInput('');
@@ -210,6 +211,8 @@ export const AdminApp: React.FC = () => {
   };
 
   const handleToggleEventLive = (eventId: string) => {
+    const target = events.find((e) => e.id === eventId);
+    const nextLive = target ? !target.isLive : true;
     setEvents((prev) => toggleEventLiveStatus(prev, eventId));
     const token = window.sessionStorage.getItem(AUTH_STORAGE_KEY);
     fetch(`/api/admin/events/${eventId}`, {
@@ -218,12 +221,25 @@ export const AdminApp: React.FC = () => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ isLive: true }),
+      body: JSON.stringify({ isLive: nextLive }),
     }).catch(() => {});
   };
 
   const handleDoorSale = (eventId: string) => {
+    const target = events.find((e) => e.id === eventId);
+    const nextSold = target ? Math.min(target.capacity, target.sold + 1) : undefined;
     setEvents((prev) => incrementEventCheckInOrSold(prev, eventId, 1));
+    if (nextSold !== undefined) {
+      const token = window.sessionStorage.getItem(AUTH_STORAGE_KEY);
+      fetch(`/api/admin/events/${eventId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ sold: nextSold }),
+      }).catch(() => {});
+    }
   };
 
   const handleCreateEvent = (
