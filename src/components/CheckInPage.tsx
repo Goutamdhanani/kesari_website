@@ -8,6 +8,7 @@ import {
   ChevronUp,
   Clock,
   Layers,
+  Mic2,
   Phone,
   RotateCcw,
   Shield,
@@ -45,7 +46,7 @@ interface QueuedCheckIn {
   localId: string;
   name: string;
   phone: string;
-  role: 'Audience' | 'Organisers';
+  role: 'Audience' | 'Organisers' | 'Artist';
   clientInfo: DeviceDetails;
   queuedAt: string;
 }
@@ -79,7 +80,7 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [countryCode, setCountryCode] = useState('+91');
-  const [role, setRole] = useState<'Audience' | 'Organisers'>('Audience');
+  const [role, setRole] = useState<'Audience' | 'Organisers' | 'Artist'>('Audience');
   const [error, setError] = useState<string | null>(null);
   const [showAutoInfo, setShowAutoInfo] = useState(false);
   const [deviceInfo, setDeviceInfo] = useState<DeviceDetails | null>(null);
@@ -315,6 +316,8 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 text-xs font-semibold text-white mt-0.5">
                     {result.role === 'Organisers' ? (
                       <Shield className="w-3 h-3 text-[#D8FF48]" />
+                    ) : result.role === 'Artist' ? (
+                      <Mic2 className="w-3 h-3 text-[#D8FF48]" />
                     ) : (
                       <Users className="w-3 h-3 text-[#D8FF48]" />
                     )}
@@ -333,6 +336,12 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
                   <span>{result.actualTime}</span>
                 </div>
               </div>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-[#D8FF48]/15 border border-[#D8FF48]/45 text-center">
+              <p className="text-sm font-extrabold text-[#D8FF48] tracking-wide">
+                Ask for your band at the desk
+              </p>
             </div>
 
             {result.warning && (
@@ -454,29 +463,41 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
                 <span className="block text-[10.5px] font-semibold uppercase tracking-wider text-white/60 pl-1">
                   Attending As
                 </span>
-                <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-black/45 border border-white/10">
+                <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-black/45 border border-white/10">
                   <button
                     type="button"
                     onClick={() => setRole('Audience')}
-                    className={`py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+                    className={`py-2.5 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
                       role === 'Audience'
                         ? 'bg-[#D8FF48] text-[#07070A]'
                         : 'text-white/65 hover:text-white hover:bg-white/[0.04]'
                     }`}
                   >
-                    <Users className="w-3.5 h-3.5" />
+                    <Users className="w-3.5 h-3.5 shrink-0" />
                     <span>Audience</span>
                   </button>
                   <button
                     type="button"
+                    onClick={() => setRole('Artist')}
+                    className={`py-2.5 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+                      role === 'Artist'
+                        ? 'bg-[#D8FF48] text-[#07070A]'
+                        : 'text-white/65 hover:text-white hover:bg-white/[0.04]'
+                    }`}
+                  >
+                    <Mic2 className="w-3.5 h-3.5 shrink-0" />
+                    <span>Artist</span>
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setRole('Organisers')}
-                    className={`py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+                    className={`py-2.5 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
                       role === 'Organisers'
                         ? 'bg-[#D8FF48] text-[#07070A]'
                         : 'text-white/65 hover:text-white hover:bg-white/[0.04]'
                     }`}
                   >
-                    <Shield className="w-3.5 h-3.5" />
+                    <Shield className="w-3.5 h-3.5 shrink-0" />
                     <span>Organisers</span>
                   </button>
                 </div>
