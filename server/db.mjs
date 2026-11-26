@@ -69,7 +69,7 @@ export const DEFAULT_EVENTS = [
     capacity: 40,
     sold: 22,
     isLive: true,
-    imageUrl: '/assets/events/book_us_01_live_music.jpg',
+    imageUrl: '/assets/events/ev_sukoon.jpg',
     description: 'A soulful and vibrant live rendition of classic and contemporary melodies featuring Amour String Quartet Live at Kesari - The Memory Studio.',
     tiers: [
       { id: 'standard', name: 'Acoustic Hall Pass', price: 349, perks: 'Entry to live acoustic hall session' }
@@ -91,7 +91,7 @@ export const DEFAULT_EVENTS = [
     capacity: 25,
     sold: 18,
     isLive: true,
-    imageUrl: '/assets/events/book_us_02_spoken_word.jpg',
+    imageUrl: '/assets/events/ev_openmic.jpg',
     description: 'Intimate acoustic guitar, candlelit wooden stage, and craft beverages under warm studio lights at Kesari - The Memory Studio.',
     tiers: [
       { id: 'ga', name: 'Open Mic Audience Pass', price: 950, perks: 'Studio lounge seating & welcome drink' },
@@ -114,7 +114,7 @@ export const DEFAULT_EVENTS = [
     capacity: 60,
     sold: 52,
     isLive: true,
-    imageUrl: '/assets/book-us/book_us_03_concerts.jpg',
+    imageUrl: '/assets/events/ev_rock.jpg',
     description: 'An electrifying night celebrating iconic guitar riffs, drum jams, and legendary rock anthems performed live at Kesari - The Memory Studio.',
     tiers: [
       { id: 'ga', name: 'General Studio Pass', price: 1499, perks: 'Entry to live studio hall & acoustic lounge' },
@@ -210,7 +210,7 @@ export const DEFAULT_EVENTS = [
     capacity: 50,
     sold: 38,
     isLive: true,
-    imageUrl: '/assets/book-us/book_us_05_comedy.jpg',
+    imageUrl: '/assets/events/ev_comedy_kesari.jpg',
     description: 'Non-stop laughter, sharp observational humor, and hilarious storytelling live on the Kesari stage in Koramangala.',
     tiers: [
       { id: 'standard', name: 'Comedy Pass', price: 499, perks: 'Entry + front seating' }
@@ -232,7 +232,7 @@ export const DEFAULT_EVENTS = [
     capacity: 30,
     sold: 19,
     isLive: true,
-    imageUrl: '/assets/book-us/book_us_06_dance.jpg',
+    imageUrl: '/assets/events/ev_dance_kesari.jpg',
     description: 'Choreography, body isolations, and synchronized dance movement on our professional sprung wood floor at Kesari.',
     tiers: [
       { id: 'workshop', name: 'Workshop Pass', price: 799, perks: '2-hour masterclass + video footage' }
