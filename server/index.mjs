@@ -18,6 +18,14 @@ const app = express();
 const PORT = process.env.PORT || 3050;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'kesari2026';
 
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
 app.use(cors());
 app.use(express.json({ limit: '8mb' }));
 
@@ -92,13 +100,14 @@ app.get('/network-qr.png', async (req, res, next) => {
   }
 });
 
-// Public Content
+// Public Content (strips private admin fields such as checkinWebhookUrl)
 app.get('/api/content', async (req, res) => {
   try {
     const events = await dbService.getEvents();
-    const settings = await dbService.getSettings();
+    const rawSettings = await dbService.getSettings();
+    const { checkinWebhookUrl: _privateWebhook, ...publicSettings } = rawSettings || {};
     const cafeMenu = await dbService.getCafeMenu();
-    res.json({ ok: true, events, settings, cafeMenu });
+    res.json({ ok: true, events, settings: publicSettings, cafeMenu });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
@@ -821,7 +830,9 @@ async function handleQrRedirect(req, res) {
     const slug = String(req.params.slug || 'cafe').toLowerCase().trim();
     let destination = String(targets[slug] || targets.cafe || '/cafe').trim();
 
-    if (!destination) {
+    const isSafeRelative = destination.startsWith('/') && !destination.startsWith('//');
+    const isSafeHttp = /^https?:\/\//i.test(destination);
+    if (!destination || (!isSafeRelative && !isSafeHttp)) {
       destination = '/cafe';
     }
 
