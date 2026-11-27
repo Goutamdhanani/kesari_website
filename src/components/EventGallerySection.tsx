@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Maximize2, ChevronLeft, ChevronRight, X, Sparkles } from 'lucide-react';
+import { Maximize2, ChevronLeft, ChevronRight, X, Sparkles, Play, Pause } from 'lucide-react';
 
 interface EventPhoto {
   id: string;
@@ -133,6 +133,20 @@ function EventLightbox({
 export const EventGallerySection: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('all');
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [videoPlaying, setVideoPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  const toggleVideoPlay = () => {
+    const el = videoRef.current;
+    if (!el) return;
+    if (el.paused) {
+      void el.play();
+      setVideoPlaying(true);
+    } else {
+      el.pause();
+      setVideoPlaying(false);
+    }
+  };
 
   const filtered =
     activeCategory === 'all'
@@ -198,26 +212,34 @@ export const EventGallerySection: React.FC = () => {
           ))}
         </div>
 
-        {/* Featured 30s Event Video Highlight */}
-        <div className="rounded-[22px] overflow-hidden border border-white/10 bg-[#0A0B10] shadow-xl">
-          <div className="relative aspect-video w-full bg-black">
+        {/* Photo & Video Strip */}
+        <div className="flex gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
+          {/* 30s Event Highlight Video Card (1-click Play/Pause) */}
+          <button
+            type="button"
+            onClick={toggleVideoPlay}
+            aria-label={videoPlaying ? 'Pause Jamboree video' : 'Play Jamboree video'}
+            className="shrink-0 relative w-[165px] sm:w-[200px] h-[125px] sm:h-[150px] rounded-[20px] sm:rounded-[22px] overflow-hidden border border-white/12 cursor-pointer group bg-black text-left"
+          >
             <video
+              ref={videoRef}
               src="/assets/events/jamboree_30s.mp4"
               poster="/assets/events/jamboree_poster.jpg"
-              controls
               playsInline
+              loop
               preload="metadata"
+              onEnded={() => setVideoPlaying(false)}
               className="w-full h-full object-cover"
             />
-          </div>
-          <div className="px-4 py-2.5 flex items-center justify-between gap-2 border-t border-white/8 text-xs">
-            <span className="font-semibold text-white">Jamboree In Your Head — Live at Kesari</span>
-            <span className="text-[11px] font-mono text-[#D8FF48]">0:30 Highlight</span>
-          </div>
-        </div>
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/15" />
+            <span className="pointer-events-none absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/25 flex items-center justify-center text-white">
+              {videoPlaying ? <Pause size={13} /> : <Play size={13} className="ml-0.5" />}
+            </span>
+            <span className="pointer-events-none absolute bottom-2.5 left-3 right-3 text-[11px] font-semibold text-white truncate">
+              Jamboree Live (0:30)
+            </span>
+          </button>
 
-        {/* Photo Strip */}
-        <div className="flex gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
           {filtered.map((photo, idx) => (
             <motion.button
               key={photo.id}
