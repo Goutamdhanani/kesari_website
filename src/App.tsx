@@ -910,6 +910,7 @@ export default function App() {
                   <FoodSection
                     compact
                     menuItems={cafeMenu}
+                    events={events}
                     onViewFullMenu={() => handleSelectTab('menu')}
                   />
                 </div>
@@ -967,6 +968,7 @@ export default function App() {
                 </div>
                 <FoodSection
                   menuItems={cafeMenu}
+                  events={events}
                   initialSeatingLocation={
                     typeof window !== 'undefined'
                       ? new URLSearchParams(window.location.search).get('table') || ''

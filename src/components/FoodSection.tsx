@@ -12,10 +12,14 @@ import {
   AlertCircle,
   Receipt,
   Search,
+  Calendar,
+  Clock,
+  Ticket,
   User,
   Phone,
   MapPin,
 } from 'lucide-react';
+import { StudioEvent } from '../utils/studioLogic';
 
 import {
   DEFAULT_CAFE_MENU,
@@ -36,6 +40,7 @@ interface FoodSectionProps {
   compact?: boolean;
   onViewFullMenu?: () => void;
   menuItems?: MenuItem[];
+  events?: StudioEvent[];
 }
 
 const COMPACT_SNACK_IDS = ['m1', 'm5', 'm11', 'a4', 'a7', 'si2'];
@@ -46,6 +51,7 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
   compact = false,
   onViewFullMenu,
   menuItems,
+  events = [],
 }) => {
   const activeItems = menuItems && menuItems.length > 0 ? menuItems : ALL_ITEMS;
   const [filter, setFilter] = useState<MenuFilter>('all');
@@ -54,6 +60,10 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [seatingLocation, setSeatingLocation] = useState(initialSeatingLocation);
+  const [pickupDate, setPickupDate] = useState('');
+  const [pickupTime, setPickupTime] = useState('');
+  const [selectedEventId, setSelectedEventId] = useState<string>('');
+  const [customEventName, setCustomEventName] = useState('');
   const [specialNote, setSpecialNote] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [orderSent, setOrderSent] = useState(false);
@@ -94,11 +104,23 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
       .map((item) => `• ${item.qty}x ${item.name} - ₹${item.itemTotal}`)
       .join('\n');
 
+    const pickedEvent = events.find((ev) => ev.id === selectedEventId);
+    const resolvedEvent =
+      selectedEventId === '__custom__'
+        ? customEventName.trim()
+        : pickedEvent
+          ? `${pickedEvent.title} (${pickedEvent.dateLabel} · ${pickedEvent.timeLabel})`
+          : customEventName.trim();
+
     return [
-      `*KESARI CAFE ORDER*`,
+      `*KESARI CAFE PICKUP / ORDER*`,
       customerName.trim() ? `*Name:* ${customerName.trim()}` : null,
       customerPhone.trim() ? `*Phone:* ${customerPhone.trim()}` : null,
       seatingLocation.trim() ? `*Table / Seating:* ${seatingLocation.trim()}` : null,
+      pickupDate.trim() || pickupTime.trim()
+        ? `*Pickup Date & Time:* ${[pickupDate.trim(), pickupTime.trim()].filter(Boolean).join(' · ')}`
+        : null,
+      resolvedEvent ? `*Event:* ${resolvedEvent}` : null,
       `---------------------------------`,
       itemsListText,
       `---------------------------------`,
@@ -443,6 +465,74 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
 
             {/* Customer Details Form for WhatsApp message */}
             <form onSubmit={handleSendWhatsAppOrder} className="space-y-3 pt-1">
+              {/* Simple 2-Column Pickup Schedule: Date & Time + Event */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-medium text-white/70 flex items-center gap-1.5">
+                    <Calendar size={12} className="text-[#D8FF48]" />
+                    <span>Pickup Date &amp; Time (Optional)</span>
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="date"
+                      value={pickupDate}
+                      onChange={(e) => setPickupDate(e.target.value)}
+                      className="w-full bg-white/5 border border-white/12 rounded-xl px-2.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#22C55E] transition-colors"
+                    />
+                    <div className="relative">
+                      <Clock size={12} className="text-white/40 absolute left-2.5 top-3 pointer-events-none" />
+                      <input
+                        type="time"
+                        value={pickupTime}
+                        onChange={(e) => setPickupTime(e.target.value)}
+                        className="w-full bg-white/5 border border-white/12 rounded-xl pl-7 pr-2 py-2.5 text-xs text-white focus:outline-none focus:border-[#22C55E] transition-colors"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-medium text-white/70 flex items-center gap-1.5">
+                    <Ticket size={12} className="text-[#D8FF48]" />
+                    <span>Event (Choose or Type)</span>
+                  </label>
+                  {events.length > 0 ? (
+                    <div className="space-y-2">
+                      <select
+                        value={selectedEventId}
+                        onChange={(e) => setSelectedEventId(e.target.value)}
+                        className="w-full bg-[#12151C] border border-white/12 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#22C55E] transition-colors"
+                      >
+                        <option value="">Casual Visit / Pickup Now</option>
+                        {events.map((ev) => (
+                          <option key={ev.id} value={ev.id}>
+                            {ev.title} ({ev.dateLabel} · {ev.timeLabel})
+                          </option>
+                        ))}
+                        <option value="__custom__">Other Event (Enter name)</option>
+                      </select>
+                      {selectedEventId === '__custom__' && (
+                        <input
+                          type="text"
+                          placeholder="Enter event name"
+                          value={customEventName}
+                          onChange={(e) => setCustomEventName(e.target.value)}
+                          className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-[#22C55E]"
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <input
+                      type="text"
+                      placeholder="Event name or Casual Pickup"
+                      value={customEventName}
+                      onChange={(e) => setCustomEventName(e.target.value)}
+                      className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#22C55E] transition-colors"
+                    />
+                  )}
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-[11px] font-medium text-white/70 flex items-center gap-1.5">
