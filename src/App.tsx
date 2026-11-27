@@ -35,7 +35,8 @@ import { StudioServicesSection } from './components/StudioServicesSection';
 import { GallerySection } from './components/GallerySection';
 import { EventGallerySection } from './components/EventGallerySection';
 import { VenueAccommodationsSection } from './components/VenueAccommodationsSection';
-import { FoodSection, MenuItem } from './components/FoodSection';
+import { FoodSection } from './components/FoodSection';
+import { MenuItem } from './data/cafeMenu';
 import { ContactSection } from './components/ContactSection';
 import { MinimalMenuBar } from './components/MinimalMenuBar';
 import { StudioPagesView, MainSectionKey } from './components/StudioPagesView';
@@ -185,7 +186,9 @@ export default function App() {
         if (data && Array.isArray(data.events)) {
           setEvents(sanitizeEvents(data.events));
         }
-        if (data?.settings?.cafeMenu && Array.isArray(data.settings.cafeMenu) && data.settings.cafeMenu.length > 0) {
+        if (Array.isArray(data?.cafeMenu) && data.cafeMenu.length > 0) {
+          setCafeMenu(data.cafeMenu);
+        } else if (data?.settings?.cafeMenu && Array.isArray(data.settings.cafeMenu) && data.settings.cafeMenu.length > 0) {
           setCafeMenu(data.settings.cafeMenu);
         }
       })

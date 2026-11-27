@@ -7,6 +7,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
 import { dbService } from './db.mjs';
+import { MENU_CATEGORIES } from './cafeMenuData.mjs';
 
 dotenv.config();
 
@@ -96,7 +97,18 @@ app.get('/api/content', async (req, res) => {
   try {
     const events = await dbService.getEvents();
     const settings = await dbService.getSettings();
-    res.json({ ok: true, events, settings });
+    const cafeMenu = await dbService.getCafeMenu();
+    res.json({ ok: true, events, settings, cafeMenu });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Public Cafe Menu
+app.get('/api/cafe-menu', async (req, res) => {
+  try {
+    const items = await dbService.getCafeMenu();
+    res.json({ ok: true, items, categories: MENU_CATEGORIES });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
@@ -407,9 +419,51 @@ app.get('/api/admin/data', async (req, res) => {
     const orders = await dbService.getOrders();
     const bookings = await dbService.getBookings();
     const enquiries = await dbService.getEnquiries();
+    const cafeMenu = await dbService.getCafeMenu();
     const settings = await dbService.getSettings();
     const health = dbService.getHealth();
-    res.json({ ok: true, events, artists, orders, bookings, enquiries, settings, health });
+    res.json({ ok: true, events, artists, orders, bookings, enquiries, cafeMenu, settings, health });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Admin Cafe Menu CRUD
+app.post('/api/admin/cafe-menu', async (req, res) => {
+  try {
+    const { name, price } = req.body || {};
+    if (!name || !String(name).trim() || !Number.isFinite(Number(price)) || Number(price) <= 0) {
+      return res.status(400).json({ ok: false, error: 'Valid item name and price required.' });
+    }
+    const item = await dbService.saveCafeItem(req.body);
+    res.status(201).json({ ok: true, item });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.put('/api/admin/cafe-menu/:id', async (req, res) => {
+  try {
+    const item = await dbService.saveCafeItem(req.body || {}, req.params.id);
+    res.json({ ok: true, item });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.delete('/api/admin/cafe-menu/:id', async (req, res) => {
+  try {
+    await dbService.deleteCafeItem(req.params.id);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.post('/api/admin/cafe-menu/reset', async (req, res) => {
+  try {
+    const items = await dbService.resetCafeMenu();
+    res.json({ ok: true, items });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }

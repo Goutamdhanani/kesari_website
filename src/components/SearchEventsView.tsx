@@ -17,7 +17,7 @@ import {
   StudioEvent,
   formatCurrencyINR,
 } from '../utils/studioLogic';
-import { CAFE_MENU_ITEMS, MenuItem } from './FoodSection';
+import { DEFAULT_CAFE_MENU, MenuItem } from '../data/cafeMenu';
 import { StudioArtist, getArtistDisplayName } from './ArtistsPage';
 import { EventFeedList } from './EventFeedList';
 
@@ -161,7 +161,7 @@ export const SearchEventsView: React.FC<SearchEventsViewProps> = ({
   }, [q]);
 
   // Café Food & Beverages (live backend menu + fallback)
-  const activeCafeMenu = cafeMenu && cafeMenu.length > 0 ? cafeMenu : CAFE_MENU_ITEMS;
+  const activeCafeMenu = cafeMenu && cafeMenu.length > 0 ? cafeMenu : DEFAULT_CAFE_MENU;
   const matchingFood = useMemo(() => {
     if (!q) return activeCafeMenu;
     return activeCafeMenu.filter(

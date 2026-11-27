@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
+import { DEFAULT_CAFE_MENU } from './cafeMenuData.mjs';
 
 dotenv.config();
 
@@ -264,6 +265,7 @@ class DatabaseService {
       orders: [],
       bookings: [],
       enquiries: [],
+      cafeMenu: DEFAULT_CAFE_MENU,
       settings: DEFAULT_SETTINGS,
     };
   }
@@ -294,6 +296,10 @@ class DatabaseService {
         const existingSettings = await this.mongoDb.collection('settings').findOne({ _id: 'main' });
         if (!existingSettings) {
           await this.mongoDb.collection('settings').insertOne({ ...DEFAULT_SETTINGS, _id: 'main' });
+        }
+        const cafeCount = await this.mongoDb.collection('cafe_menu').countDocuments();
+        if (cafeCount === 0) {
+          await this.mongoDb.collection('cafe_menu').insertMany(DEFAULT_CAFE_MENU);
         }
       } catch (err) {
         console.warn('[DB] MongoDB Atlas connection warning:', err.message);
@@ -616,6 +622,77 @@ class DatabaseService {
       this.saveLocalFile();
     }
     return artist;
+  }
+
+  // --- CAFE MENU ---
+  async getCafeMenu() {
+    if (this.isUsingMongo) {
+      const list = await this.mongoDb.collection('cafe_menu').find({}).toArray();
+      if (list.length > 0) return list.map(({ _id, ...rest }) => rest);
+      return DEFAULT_CAFE_MENU;
+    }
+    if (!Array.isArray(this.localData.cafeMenu) || this.localData.cafeMenu.length === 0) {
+      this.localData.cafeMenu = DEFAULT_CAFE_MENU;
+      this.saveLocalFile();
+    }
+    return this.localData.cafeMenu;
+  }
+
+  async saveCafeItem(itemData, itemId) {
+    const id = itemId || itemData.id || `cafe-${Date.now().toString(36)}`;
+    const item = {
+      id,
+      name: String(itemData.name || '').trim(),
+      category: String(itemData.category || 'Mains').trim(),
+      categoryId: String(itemData.categoryId || 'mains').trim(),
+      price: Number(itemData.price) || 0,
+      ...(itemData.badge ? { badge: String(itemData.badge).trim() } : {}),
+      isVeg: itemData.isVeg !== false,
+      available: itemData.available !== false,
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (this.isUsingMongo) {
+      await this.mongoDb.collection('cafe_menu').updateOne(
+        { id },
+        { $set: item },
+        { upsert: true }
+      );
+      return item;
+    }
+
+    const list = await this.getCafeMenu();
+    const idx = list.findIndex((i) => i.id === id);
+    if (idx >= 0) {
+      list[idx] = { ...list[idx], ...item };
+    } else {
+      list.unshift(item);
+    }
+    this.localData.cafeMenu = list;
+    this.saveLocalFile();
+    return item;
+  }
+
+  async deleteCafeItem(itemId) {
+    if (this.isUsingMongo) {
+      await this.mongoDb.collection('cafe_menu').deleteOne({ id: itemId });
+      return true;
+    }
+    const list = await this.getCafeMenu();
+    this.localData.cafeMenu = list.filter((i) => i.id !== itemId);
+    this.saveLocalFile();
+    return true;
+  }
+
+  async resetCafeMenu() {
+    if (this.isUsingMongo) {
+      await this.mongoDb.collection('cafe_menu').deleteMany({});
+      await this.mongoDb.collection('cafe_menu').insertMany(DEFAULT_CAFE_MENU);
+      return DEFAULT_CAFE_MENU;
+    }
+    this.localData.cafeMenu = DEFAULT_CAFE_MENU.map((i) => ({ ...i }));
+    this.saveLocalFile();
+    return this.localData.cafeMenu;
   }
 
   async deleteArtist(artistId) {
