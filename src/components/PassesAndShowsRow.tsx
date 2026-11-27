@@ -219,6 +219,7 @@ export const PassesAndShowsRow: React.FC<PassesAndShowsRowProps> = ({
   onViewAll,
   onBookUs,
 }) => {
+  const [showAllExperiences, setShowAllExperiences] = React.useState(false);
   return (
     <div className="space-y-7">
       {/* ── Row 1: Passes & Shows (Live Event Cards in Reference Image 2 Style) ── */}
@@ -345,94 +346,121 @@ export const PassesAndShowsRow: React.FC<PassesAndShowsRowProps> = ({
           </div>
           <button
             type="button"
-            onClick={onViewAll}
+            onClick={() => setShowAllExperiences((v) => !v)}
             className="text-xs font-medium text-white/65 hover:text-white transition-colors"
           >
-            All Experiences &gt;
+            {showAllExperiences ? 'Collapse Grid ‹' : 'All Experiences ›'}
           </button>
         </div>
 
-        <div className="flex items-stretch gap-3 sm:gap-3.5 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
-          {BOOK_US_FOR_ITEMS.map((item, index) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.28, delay: Math.min(index * 0.03, 0.25) }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => (onBookUs ? onBookUs(item.title) : onViewAll())}
-              className={`cursor-pointer relative w-[235px] sm:w-[265px] h-[245px] sm:h-[268px] shrink-0 snap-start rounded-[24px] sm:rounded-[28px] border transition-all overflow-hidden group ${
-                item.imageUrl
-                  ? 'border-white/20 hover:border-white/50'
-                  : 'border-white/10 bg-[#0A0B10]/85 backdrop-blur-md hover:border-white/25 flex flex-col justify-between p-4 sm:p-5'
-              }`}
-              style={{
-                boxShadow: `0 4px 22px -6px ${item.glow}`,
-              }}
-            >
-              {item.imageUrl ? (
-                <>
-                  <img
-                    src={item.imageUrl}
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-[24px] sm:rounded-[28px]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-4 pointer-events-none">
-                    <span className="text-[10px] text-white/70 uppercase tracking-wider font-semibold">
-                      Studio Space
-                    </span>
-                    <span className="text-xs font-semibold text-white flex items-center gap-1 drop-shadow-md">
-                      Enquire ›
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <>
-                  {/* Soft ambient corner light */}
-                  <div
-                    className="absolute -top-10 -right-10 w-32 h-32 rounded-full pointer-events-none blur-2xl opacity-40 group-hover:opacity-70 transition-opacity"
-                    style={{ background: item.glow }}
-                  />
-
-                  <div className="relative z-10 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wider uppercase border ${item.accent}`}>
-                        {item.tag}
+        <div
+          className={
+            showAllExperiences
+              ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5'
+              : 'flex items-stretch gap-3 sm:gap-3.5 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-1 -mx-4 px-4 sm:mx-0 sm:px-0'
+          }
+        >
+          {BOOK_US_FOR_ITEMS.map((item, index) => {
+            const hasBakedPosterText = Boolean(item.imageUrl) && item.id <= 10;
+            return (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.28, delay: Math.min(index * 0.03, 0.25) }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => (onBookUs ? onBookUs(item.title) : onViewAll())}
+                className={`cursor-pointer relative ${
+                  showAllExperiences
+                    ? 'w-full h-[250px]'
+                    : 'w-[235px] sm:w-[265px] h-[245px] sm:h-[268px] shrink-0 snap-start'
+                } rounded-[24px] sm:rounded-[28px] border transition-all overflow-hidden group ${
+                  hasBakedPosterText
+                    ? 'border-white/20 hover:border-white/50'
+                    : 'border-white/15 bg-[#0A0B10]/85 backdrop-blur-md hover:border-white/35 flex flex-col justify-between p-4 sm:p-5'
+                }`}
+                style={{
+                  boxShadow: `0 4px 22px -6px ${item.glow}`,
+                }}
+              >
+                {hasBakedPosterText ? (
+                  <>
+                    <img
+                      src={item.imageUrl}
+                      alt={item.title}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-[24px] sm:rounded-[28px]"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-4 pointer-events-none">
+                      <span className="text-[10px] text-white/70 uppercase tracking-wider font-semibold">
+                        Studio Space
                       </span>
-                      <span className="text-[11px] font-bold text-white/35 tabular-nums">
-                        #{String(item.id).padStart(2, '0')}
+                      <span className="text-xs font-semibold text-white flex items-center gap-1 drop-shadow-md">
+                        Enquire ›
                       </span>
                     </div>
+                  </>
+                ) : (
+                  <>
+                    {item.imageUrl && (
+                      <>
+                        <img
+                          src={item.imageUrl}
+                          alt={item.title}
+                          loading="lazy"
+                          decoding="async"
+                          className="pointer-events-none absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050507]/95 via-[#050507]/65 to-[#050507]/45" />
+                      </>
+                    )}
 
-                    <h3 className="text-sm sm:text-[15px] font-bold text-white leading-snug line-clamp-2 pt-1 group-hover:text-white transition-colors">
-                      {item.title}
-                    </h3>
+                    <div
+                      className="absolute -top-10 -right-10 w-32 h-32 rounded-full pointer-events-none blur-2xl opacity-40 group-hover:opacity-70 transition-opacity"
+                      style={{ background: item.glow }}
+                    />
 
-                    <p className="text-[11px] sm:text-xs text-white/60 leading-relaxed line-clamp-3">
-                      {item.description}
-                    </p>
-                  </div>
+                    <div className="relative z-10 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wider uppercase border backdrop-blur-sm ${item.accent}`}>
+                          {item.tag}
+                        </span>
+                        <span className="text-[11px] font-bold text-white/60 tabular-nums">
+                          #{String(item.id).padStart(2, '0')}
+                        </span>
+                      </div>
 
-                  <div className="relative z-10 pt-2.5 border-t border-white/8 flex items-center justify-between">
-                    <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium">
-                      Studio Space
-                    </span>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (onBookUs) onBookUs(item.title);
-                        else onViewAll();
-                      }}
-                      className="text-xs font-semibold text-white/80 group-hover:text-white flex items-center gap-1 transition-colors"
-                    >
-                      Enquire ›
-                    </button>
-                  </div>
-                </>
-              )}
-            </motion.div>
-          ))}
+                      <h3 className="text-sm sm:text-[15px] font-bold text-white leading-snug line-clamp-2 pt-1 group-hover:text-white transition-colors">
+                        {item.title}
+                      </h3>
+
+                      <p className="text-[11px] sm:text-xs text-white/75 leading-relaxed line-clamp-3">
+                        {item.description}
+                      </p>
+                    </div>
+
+                    <div className="relative z-10 pt-2.5 border-t border-white/15 flex items-center justify-between">
+                      <span className="text-[10px] text-white/60 uppercase tracking-wider font-medium">
+                        Studio Space
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onBookUs) onBookUs(item.title);
+                          else onViewAll();
+                        }}
+                        className="text-xs font-semibold text-white/90 group-hover:text-white flex items-center gap-1 transition-colors"
+                      >
+                        Enquire ›
+                      </button>
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            );
+          })}
         </div>
       </section>
     </div>
