@@ -216,13 +216,26 @@ app.get('/api/payments/config', async (req, res) => {
 
 app.post('/api/payments/razorpay/create-order', async (req, res) => {
   try {
-    const { amount, receipt, notes, orderId } = req.body;
-    const numericAmount = Number(amount);
-    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+    const { amount, receipt, notes, orderId } = req.body || {};
+    let finalAmount = Number(amount);
+
+    // If linked to a backend order, enforce the server-side order totalAmount
+    if (orderId) {
+      const orders = await dbService.getOrders();
+      const linked = orders.find((o) => o.id === orderId);
+      if (!linked) {
+        return res.status(404).json({ ok: false, error: 'Referenced order not found.' });
+      }
+      if (Number.isFinite(Number(linked.totalAmount)) && Number(linked.totalAmount) > 0) {
+        finalAmount = Number(linked.totalAmount);
+      }
+    }
+
+    if (!Number.isFinite(finalAmount) || finalAmount <= 0) {
       return res.status(400).json({ ok: false, error: 'Valid positive amount is required.' });
     }
 
-    const amountPaise = Math.round(numericAmount * 100);
+    const amountPaise = Math.round(finalAmount * 100);
     const keyId = process.env.RAZORPAY_KEY_ID || '';
     const keySecret = process.env.RAZORPAY_KEY_SECRET || '';
 
@@ -239,7 +252,7 @@ app.post('/api/payments/razorpay/create-order', async (req, res) => {
           amount: amountPaise,
           currency: 'INR',
           receipt: receipt || `kesari_${Date.now()}`,
-          notes: notes || {},
+          notes: { ...(notes || {}), ...(orderId ? { backendOrderId: orderId } : {}) },
         }),
       });
       const rzpData = await rzpRes.json();
@@ -285,43 +298,107 @@ app.post('/api/payments/razorpay/verify', async (req, res) => {
       razorpay_payment_id,
       razorpay_signature,
       orderId,
-      simulate,
-    } = req.body;
+    } = req.body || {};
 
     const keySecret = process.env.RAZORPAY_KEY_SECRET || '';
-
-    if (keySecret && !simulate) {
-      if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-        return res.status(400).json({ ok: false, error: 'Missing Razorpay signature verification fields.' });
-      }
-      const expected = crypto
-        .createHmac('sha256', keySecret)
-        .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-        .digest('hex');
-
-      if (expected !== razorpay_signature) {
-        return res.status(400).json({ ok: false, error: 'Razorpay payment signature verification failed.' });
-      }
+    if (!keySecret) {
+      return res.status(503).json({
+        ok: false,
+        verified: false,
+        error: 'Razorpay is not configured yet. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in environment.',
+      });
     }
 
-    const paymentRef = razorpay_payment_id || `RZP-PENDING-${Date.now().toString().slice(-6)}`;
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({
+        ok: false,
+        verified: false,
+        error: 'Missing Razorpay signature verification fields.',
+      });
+    }
+
+    const expected = crypto
+      .createHmac('sha256', keySecret)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest('hex');
+
+    const a = Buffer.from(expected, 'utf8');
+    const b = Buffer.from(String(razorpay_signature), 'utf8');
+    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+      return res.status(400).json({
+        ok: false,
+        verified: false,
+        error: 'Razorpay payment signature verification failed.',
+      });
+    }
+
+    // Idempotency: prevent replay of the same payment_id on a different order
+    const orders = await dbService.getOrders();
+    const duplicate = orders.find((o) => o.utr === razorpay_payment_id && o.id !== orderId);
+    if (duplicate) {
+      return res.status(409).json({
+        ok: false,
+        verified: false,
+        error: 'This Razorpay payment ID has already been claimed by another order.',
+      });
+    }
+
     let verifiedOrder = null;
     if (orderId) {
       verifiedOrder = await dbService.verifyOrder(orderId, {
-        utr: paymentRef,
-        autoVerified: Boolean(keySecret && !simulate),
+        utr: razorpay_payment_id,
+        autoVerified: true,
       });
     }
 
     return res.json({
       ok: true,
       verified: true,
-      mode: keySecret && !simulate ? 'live' : 'awaiting_integration',
-      paymentRef,
+      paymentRef: razorpay_payment_id,
       order: verifiedOrder,
     });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Razorpay Server-to-Server Webhook (handles payment.captured / order.paid even if browser closes)
+app.post('/api/payments/razorpay/webhook', async (req, res) => {
+  try {
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET || '';
+    if (!webhookSecret) {
+      return res.status(503).json({ ok: false, error: 'RAZORPAY_WEBHOOK_SECRET not configured.' });
+    }
+
+    const signature = String(req.headers['x-razorpay-signature'] || '');
+    const rawBody = JSON.stringify(req.body || {});
+    const expected = crypto
+      .createHmac('sha256', webhookSecret)
+      .update(rawBody)
+      .digest('hex');
+
+    const a = Buffer.from(expected, 'utf8');
+    const b = Buffer.from(signature, 'utf8');
+    if (!signature || a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+      return res.status(400).json({ ok: false, error: 'Invalid webhook signature.' });
+    }
+
+    const eventType = req.body?.event;
+    if (eventType === 'payment.captured' || eventType === 'order.paid') {
+      const paymentEntity = req.body?.payload?.payment?.entity;
+      const backendOrderId = paymentEntity?.notes?.backendOrderId;
+      const paymentId = paymentEntity?.id;
+      if (backendOrderId && paymentId) {
+        await dbService.verifyOrder(backendOrderId, {
+          utr: paymentId,
+          autoVerified: true,
+        });
+      }
+    }
+
+    return res.json({ ok: true, received: true });
+  } catch (err) {
+    return res.status(500).json({ ok: false, error: err.message });
   }
 });
 

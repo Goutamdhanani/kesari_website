@@ -104,9 +104,9 @@ export async function verifyRazorpayPayment(params: {
     return await res.json();
   } catch {
     return {
-      ok: true,
-      verified: true,
-      paymentRef: params.razorpay_payment_id || `RZP-${Date.now().toString().slice(-6)}`,
+      ok: false,
+      verified: false,
+      error: 'Unable to reach payment verification server.',
     };
   }
 }
