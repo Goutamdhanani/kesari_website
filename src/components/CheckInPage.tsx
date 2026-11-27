@@ -3,7 +3,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Calendar,
-  CheckCircle2,
+  Check,
   ChevronDown,
   ChevronUp,
   Clock,
@@ -12,9 +12,9 @@ import {
   Phone,
   RotateCcw,
   Shield,
-  Sparkles,
   User,
   Users,
+  UtensilsCrossed,
   Wifi,
   WifiOff,
 } from 'lucide-react';
@@ -74,9 +74,10 @@ function saveOfflineQueue(items: QueuedCheckIn[]): void {
 
 interface CheckInPageProps {
   onBack?: () => void;
+  onOrderFood?: () => void;
 }
 
-export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
+export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack, onOrderFood }) => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [countryCode, setCountryCode] = useState('+91');
@@ -85,6 +86,7 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
   const [showAutoInfo, setShowAutoInfo] = useState(false);
   const [deviceInfo, setDeviceInfo] = useState<DeviceDetails | null>(null);
   const [result, setResult] = useState<CheckInResponse | null>(null);
+  const [redirectSeconds, setRedirectSeconds] = useState<number | null>(null);
   const [pendingCount, setPendingCount] = useState<number>(() =>
     typeof window !== 'undefined' ? loadOfflineQueue().length : 0
   );
@@ -245,11 +247,37 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
 
   const handleReset = () => {
     setResult(null);
+    setRedirectSeconds(null);
     setName('');
     setPhone('');
     setError(null);
     collectAllDeviceInfo().then(setDeviceInfo);
   };
+
+  // Start 60-second auto-redirect to Café ONLY after check-in confirmation
+  useEffect(() => {
+    if (!result) {
+      setRedirectSeconds(null);
+      return;
+    }
+    setRedirectSeconds(60);
+  }, [result]);
+
+  useEffect(() => {
+    if (redirectSeconds === null) return;
+    if (redirectSeconds <= 0) {
+      if (onOrderFood) {
+        onOrderFood();
+      } else if (typeof window !== 'undefined') {
+        window.location.href = '/cafe';
+      }
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setRedirectSeconds((prev) => (prev === null ? null : prev - 1));
+    }, 1000);
+    return () => window.clearTimeout(timer);
+  }, [redirectSeconds, onOrderFood]);
 
   return (
     <section aria-label="Guest Check-In" className="space-y-5">
@@ -285,18 +313,19 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
 
       <div className="max-w-[460px] mx-auto">
         {result ? (
-          <div className="surface-charcoal rounded-[30px] p-6 sm:p-8 space-y-6 border border-[#D8FF48]/25 shadow-2xl">
-            <div className="text-center space-y-2.5">
-              <div className="w-12 h-12 rounded-2xl bg-[#D8FF48]/15 border border-[#D8FF48]/40 text-[#D8FF48] flex items-center justify-center mx-auto">
-                <CheckCircle2 className="w-6 h-6" />
+          <div className="surface-charcoal rounded-[30px] p-6 sm:p-8 space-y-6 border border-white/12 shadow-2xl">
+            <div className="text-center space-y-3">
+              <div className="w-14 h-14 rounded-2xl bg-white text-[#07070A] flex items-center justify-center mx-auto shadow-[0_0_32px_rgba(255,255,255,0.28)]">
+                <Check className="w-7 h-7 stroke-[2.75]" />
               </div>
-              <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-[#D8FF48]">
-                {result.offlinePending ? 'SAVED OFFLINE · WILL SYNC' : 'CHECK-IN SENT'}
-              </p>
-              <h2 className="text-2xl font-bold text-white tracking-tight">
-                Welcome, {result.name}
-              </h2>
-              <p className="text-xs text-white/55">{result.message}</p>
+              <div className="space-y-1">
+                <h2 className="text-2xl sm:text-[26px] font-bold text-white tracking-tight">
+                  Check-In Confirmed
+                </h2>
+                <p className="text-xs text-white/60">
+                  Welcome, <span className="text-white font-semibold">{result.name}</span> — you&apos;re all set for the event.
+                </p>
+              </div>
             </div>
 
             <div className="rounded-2xl bg-black/45 border border-white/10 p-4 space-y-3">
@@ -353,23 +382,39 @@ export const CheckInPage: React.FC<CheckInPageProps> = ({ onBack }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <button
                 type="button"
+                onClick={() => {
+                  setRedirectSeconds(null);
+                  if (onOrderFood) onOrderFood();
+                }}
+                className="h-12 rounded-full bg-white hover:bg-white/90 text-[#07070A] text-sm font-bold flex items-center justify-center gap-2 shadow-[0_0_28px_rgba(255,255,255,0.28)] transition-all active:scale-[0.98] cursor-pointer"
+              >
+                <UtensilsCrossed className="w-4 h-4" />
+                <span>Order Food</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
                 onClick={handleReset}
-                className="h-11 rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/10 text-xs font-semibold text-white flex items-center justify-center gap-1.5 transition-colors"
+                className="h-12 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-xs font-semibold text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Check In Another</span>
               </button>
-              {onBack && (
+            </div>
+
+            {redirectSeconds !== null && (
+              <p className="text-center text-[11px] text-white/45">
+                Opening Café menu in <span className="font-mono text-white/75">{redirectSeconds}s</span>{' '}
+                ·{' '}
                 <button
                   type="button"
-                  onClick={onBack}
-                  className="h-11 rounded-full bg-[#D8FF48] hover:bg-[#C8EE38] text-[#07070A] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
+                  onClick={() => setRedirectSeconds(null)}
+                  className="underline hover:text-white transition-colors"
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Explore Studio</span>
+                  Stay here
                 </button>
-              )}
-            </div>
+              </p>
+            )}
           </div>
         ) : (
           <div className="surface-charcoal rounded-[30px] p-6 sm:p-8 space-y-6 border border-white/10 shadow-2xl">

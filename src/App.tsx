@@ -979,7 +979,10 @@ export default function App() {
             )}
 
             {activeTab === 'checkin' && (
-              <CheckInPage onBack={() => handleSelectTab('explore')} />
+              <CheckInPage
+                onBack={() => handleSelectTab('explore')}
+                onOrderFood={() => handleSelectTab('menu')}
+              />
             )}
 
             {activeTab === 'schedule' && (
