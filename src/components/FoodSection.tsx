@@ -188,6 +188,14 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
       setFormError('Please add at least one item to order.');
       return;
     }
+    if (!customerName.trim() || customerName.trim().length < 2) {
+      setFormError('Please enter your name.');
+      return;
+    }
+    if (!customerPhone.trim() || customerPhone.replace(/\D/g, '').length < 10) {
+      setFormError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
 
     setFormError(null);
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
@@ -709,48 +717,38 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
                 )}
               </div>
 
-              {/* Collapsible Optional Details (Name, Table, Note) */}
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setShowOptionalDetails((v) => !v)}
-                  className="text-[11px] font-medium text-white/50 hover:text-white/80 transition-colors"
-                >
-                  {showOptionalDetails ? '− Hide name / table / note' : '+ Add name, table or note (optional)'}
-                </button>
-
-                {showOptionalDetails && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-2.5">
-                    <input
-                      type="text"
-                      placeholder="Your name (optional)"
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      className="w-full h-10 bg-white/[0.04] border border-white/12 rounded-xl px-3 text-xs text-white placeholder:text-white/35 focus:outline-none focus:border-[#D8FF48]"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Table / Seating (optional)"
-                      value={seatingLocation}
-                      onChange={(e) => setSeatingLocation(e.target.value)}
-                      className="w-full h-10 bg-white/[0.04] border border-white/12 rounded-xl px-3 text-xs text-white placeholder:text-white/35 focus:outline-none focus:border-[#D8FF48]"
-                    />
-                    <input
-                      type="tel"
-                      placeholder="Phone (optional)"
-                      value={customerPhone}
-                      onChange={(e) => setCustomerPhone(e.target.value)}
-                      className="w-full h-10 bg-white/[0.04] border border-white/12 rounded-xl px-3 text-xs text-white placeholder:text-white/35 focus:outline-none focus:border-[#D8FF48]"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Special note (optional)"
-                      value={specialNote}
-                      onChange={(e) => setSpecialNote(e.target.value)}
-                      className="w-full h-10 bg-white/[0.04] border border-white/12 rounded-xl px-3 text-xs text-white placeholder:text-white/35 focus:outline-none focus:border-[#D8FF48]"
-                    />
-                  </div>
-                )}
+              {/* Required Guest Details + Special Note */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <input
+                  type="text"
+                  required
+                  placeholder="Your Name *"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  className="w-full h-10 bg-white/[0.04] border border-white/15 rounded-xl px-3 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-[#D8FF48]"
+                />
+                <input
+                  type="tel"
+                  required
+                  placeholder="Mobile Number * (10 digits)"
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  className="w-full h-10 bg-white/[0.04] border border-white/15 rounded-xl px-3 text-xs text-white font-mono placeholder:text-white/40 focus:outline-none focus:border-[#D8FF48]"
+                />
+                <input
+                  type="text"
+                  placeholder="Special note (e.g. less spicy, hot)"
+                  value={specialNote}
+                  onChange={(e) => setSpecialNote(e.target.value)}
+                  className="w-full h-10 bg-white/[0.04] border border-white/12 rounded-xl px-3 text-xs text-white placeholder:text-white/35 focus:outline-none focus:border-[#D8FF48]"
+                />
+                <input
+                  type="text"
+                  placeholder="Table / Seating (optional)"
+                  value={seatingLocation}
+                  onChange={(e) => setSeatingLocation(e.target.value)}
+                  className="w-full h-10 bg-white/[0.04] border border-white/12 rounded-xl px-3 text-xs text-white placeholder:text-white/35 focus:outline-none focus:border-[#D8FF48]"
+                />
               </div>
 
               {formError && (
