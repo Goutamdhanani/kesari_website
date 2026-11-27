@@ -198,6 +198,24 @@ export const EventGallerySection: React.FC = () => {
           ))}
         </div>
 
+        {/* Featured 30s Event Video Highlight */}
+        <div className="rounded-[22px] overflow-hidden border border-white/10 bg-[#0A0B10] shadow-xl">
+          <div className="relative aspect-video w-full bg-black">
+            <video
+              src="/assets/events/jamboree_30s.mp4"
+              poster="/assets/events/jamboree_poster.jpg"
+              controls
+              playsInline
+              preload="metadata"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="px-4 py-2.5 flex items-center justify-between gap-2 border-t border-white/8 text-xs">
+            <span className="font-semibold text-white">Jamboree In Your Head — Live at Kesari</span>
+            <span className="text-[11px] font-mono text-[#D8FF48]">0:30 Highlight</span>
+          </div>
+        </div>
+
         {/* Photo Strip */}
         <div className="flex gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
           {filtered.map((photo, idx) => (
