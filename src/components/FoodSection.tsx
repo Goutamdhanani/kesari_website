@@ -18,6 +18,7 @@ import {
   User,
   Phone,
   MapPin,
+  X,
 } from 'lucide-react';
 import { StudioEvent } from '../utils/studioLogic';
 
@@ -67,6 +68,7 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
   const [specialNote, setSpecialNote] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [orderSent, setOrderSent] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const orderSectionId = useId();
 
   const updateQuantity = (id: string, delta: number) => {
@@ -384,33 +386,52 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
         })
       )}
 
-      {/* WhatsApp Order Details & Checkout Card */}
+      {/* Clean Checkout & Pickup Popup Modal */}
       <AnimatePresence>
-        {totalItemsCount > 0 && (
-          <motion.div
-            id={orderSectionId}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 16 }}
-            className="rounded-[26px] bg-[#0A0D12] border border-[#22C55E]/30 p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-4"
+        {checkoutOpen && totalItemsCount > 0 && (
+          <div
+            data-lenis-prevent
+            className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-end sm:items-center justify-center sm:p-6 overflow-y-auto"
+            onClick={() => setCheckoutOpen(false)}
           >
-            {/* Header with items count and Clear button */}
-            <div className="flex items-center justify-between border-b border-white/8 pb-3">
-              <div className="flex items-center gap-2">
-                <Receipt className="w-5 h-5 text-[#22C55E]" />
-                <h3 className="text-sm sm:text-base font-bold text-white">
-                  Your Cafe Order ({totalItemsCount} {totalItemsCount === 1 ? 'item' : 'items'})
-                </h3>
+            <motion.div
+              id={orderSectionId}
+              initial={{ opacity: 0, y: 24, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 24, scale: 0.98 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full sm:max-w-[520px] max-h-[92vh] overflow-y-auto rounded-t-[28px] sm:rounded-[28px] bg-[#0B0C10] border border-white/15 p-5 sm:p-6 shadow-2xl space-y-4"
+            >
+              {/* Header with items count, Clear, and Close */}
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2">
+                  <Receipt className="w-5 h-5 text-[#D8FF48]" />
+                  <h3 className="text-sm sm:text-base font-bold text-white">
+                    Your Cafe Order ({totalItemsCount} {totalItemsCount === 1 ? 'item' : 'items'})
+                  </h3>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearCart();
+                      setCheckoutOpen(false);
+                    }}
+                    className="text-xs text-white/50 hover:text-rose-400 flex items-center gap-1 transition-colors"
+                  >
+                    <Trash2 size={13} />
+                    <span>Clear</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCheckoutOpen(false)}
+                    aria-label="Close checkout"
+                    className="w-8 h-8 rounded-full bg-white/8 hover:bg-white/15 text-white/75 hover:text-white flex items-center justify-center transition-colors"
+                  >
+                    <X size={15} />
+                  </button>
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={clearCart}
-                className="text-xs text-white/50 hover:text-red-400 flex items-center gap-1 transition-colors"
-              >
-                <Trash2 size={13} />
-                <span>Clear</span>
-              </button>
-            </div>
 
             {/* Selected Items Breakdown */}
             <div className="space-y-2 max-h-48 overflow-y-auto no-scrollbar pr-1">
@@ -603,57 +624,53 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
               {/* Submit CTA */}
               <button
                 type="submit"
-                className="w-full py-3.5 px-4 rounded-2xl bg-[#22C55E] hover:bg-[#1ea850] active:scale-[0.98] text-black font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all shadow-[0_0_24px_rgba(34,197,94,0.35)] cursor-pointer"
+                className="w-full h-12 px-4 rounded-full bg-[#D8FF48] hover:bg-[#C8EE38] active:scale-[0.98] text-[#07070A] font-bold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
               >
-                <MessageSquare className="w-5 h-5 fill-black stroke-none" />
-                <span>Order via WhatsApp to 77957 77263</span>
-                <Send className="w-4 h-4 ml-1" />
+                <MessageSquare className="w-4 h-4" />
+                <span>Send Order on WhatsApp</span>
+                <Send className="w-4 h-4" />
               </button>
 
-              <p className="text-[11px] text-center text-white/50">
-                Opens WhatsApp with your items (e.g. 2x Coffee) and total (₹{totalAmount}) pre-filled — just tap Send.
+              <p className="text-[11px] text-center text-white/45">
+                Opens WhatsApp with your items, pickup date/time, event &amp; total (₹{totalAmount}) pre-filled.
               </p>
             </form>
-          </motion.div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
-      {/* Sticky 1-Tap Cart & WhatsApp Bar */}
+      {/* Clean Minimal Cart Bar (opens Popup Modal) */}
       <AnimatePresence>
-        {totalItemsCount > 0 && (
+        {totalItemsCount > 0 && !checkoutOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] max-w-xl rounded-2xl bg-[#0D1310]/95 backdrop-blur-xl border border-[#22C55E]/40 px-4 py-3 shadow-[0_12px_36px_rgba(0,0,0,0.75)] flex items-center justify-between gap-3"
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] max-w-xl rounded-2xl bg-[#0B0C10]/95 backdrop-blur-xl border border-white/15 px-4 py-3 shadow-[0_12px_36px_rgba(0,0,0,0.8)] flex items-center justify-between gap-3"
           >
             <button
               type="button"
-              onClick={() =>
-                document
-                  .getElementById(orderSectionId)
-                  ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-              }
+              onClick={() => setCheckoutOpen(true)}
               className="text-left min-w-0 flex-1"
             >
               <div className="text-xs font-bold text-white truncate">
                 {totalItemsCount} {totalItemsCount === 1 ? 'item' : 'items'} ·{' '}
                 <span className="text-[#D8FF48]">₹{totalAmount}</span>
               </div>
-              <div className="text-[11px] text-white/60 truncate">
+              <div className="text-[11px] text-white/55 truncate">
                 {cartEntries.map((i) => `${i.qty}x ${i.name}`).join(', ')}
               </div>
             </button>
 
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 h-10 px-4 rounded-xl bg-[#22C55E] hover:bg-[#1ea850] text-black text-xs font-bold inline-flex items-center gap-1.5 shadow-[0_0_16px_rgba(34,197,94,0.35)] transition-colors"
+            <button
+              type="button"
+              onClick={() => setCheckoutOpen(true)}
+              className="shrink-0 h-10 px-4 rounded-xl bg-[#D8FF48] hover:bg-[#C8EE38] text-[#07070A] text-xs font-bold inline-flex items-center gap-1.5 transition-colors"
             >
-              <Send className="w-3.5 h-3.5" />
-              <span>Send on WhatsApp</span>
-            </a>
+              <Receipt className="w-3.5 h-3.5" />
+              <span>Pickup &amp; Send</span>
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
