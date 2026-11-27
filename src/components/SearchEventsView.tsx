@@ -17,7 +17,7 @@ import {
   StudioEvent,
   formatCurrencyINR,
 } from '../utils/studioLogic';
-import { CAFE_MENU_ITEMS } from './FoodSection';
+import { CAFE_MENU_ITEMS, MenuItem } from './FoodSection';
 import { StudioArtist, getArtistDisplayName } from './ArtistsPage';
 import { EventFeedList } from './EventFeedList';
 
@@ -31,6 +31,7 @@ interface SearchEventsViewProps {
   results: StudioEvent[];
   allEvents?: StudioEvent[];
   artists?: StudioArtist[];
+  cafeMenu?: MenuItem[];
   savedIds: string[];
   onToggleSave: (eventId: string) => void;
   onSelectEvent: (event: StudioEvent) => void;
@@ -63,6 +64,7 @@ export const SearchEventsView: React.FC<SearchEventsViewProps> = ({
   results,
   allEvents,
   artists = [],
+  cafeMenu,
   savedIds,
   onToggleSave,
   onSelectEvent,
@@ -158,16 +160,18 @@ export const SearchEventsView: React.FC<SearchEventsViewProps> = ({
     );
   }, [q]);
 
-  // Café Food & Beverages
+  // Café Food & Beverages (live backend menu + fallback)
+  const activeCafeMenu = cafeMenu && cafeMenu.length > 0 ? cafeMenu : CAFE_MENU_ITEMS;
   const matchingFood = useMemo(() => {
-    if (!q) return CAFE_MENU_ITEMS;
-    return CAFE_MENU_ITEMS.filter(
+    if (!q) return activeCafeMenu;
+    return activeCafeMenu.filter(
       (item) =>
         item.name.toLowerCase().includes(q) ||
         item.category.toLowerCase().includes(q) ||
+        item.categoryId.toLowerCase().includes(q) ||
         (item.badge && item.badge.toLowerCase().includes(q)),
     );
-  }, [q]);
+  }, [q, activeCafeMenu]);
 
   const showEvents = scope === 'all' || scope === 'events';
   const showArtists = scope === 'all' || scope === 'artists';
@@ -427,7 +431,8 @@ export const SearchEventsView: React.FC<SearchEventsViewProps> = ({
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
             {matchingFood.map((item) => {
-              const isBev = item.category === 'Beverages';
+              const isBev =
+                item.categoryId === 'hot-beverages' || item.categoryId === 'cold-beverages';
               return (
                 <button
                   key={item.id}

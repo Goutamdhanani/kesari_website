@@ -927,6 +927,7 @@ export default function App() {
                 results={searchResults}
                 allEvents={events}
                 artists={artists}
+                cafeMenu={cafeMenu}
                 savedIds={savedIds}
                 onToggleSave={handleToggleSave}
                 onSelectEvent={(evt) => setCheckoutEventId(evt.id)}

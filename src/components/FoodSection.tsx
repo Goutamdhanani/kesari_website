@@ -11,6 +11,7 @@ import {
   Send,
   AlertCircle,
   Receipt,
+  Search,
   User,
   Phone,
   MapPin,
@@ -153,6 +154,7 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
 }) => {
   const activeItems = menuItems && menuItems.length > 0 ? menuItems : ALL_ITEMS;
   const [filter, setFilter] = useState<MenuFilter>('all');
+  const [menuSearch, setMenuSearch] = useState('');
   const [cart, setCart] = useState<Record<string, number>>({});
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
@@ -230,7 +232,7 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
     setOrderSent(true);
   };
 
-  const renderCard = (item: MenuItem, index: number) => {
+  const renderCard = (item: MenuItem, index: number, gridMode = false) => {
     const qty = cart[item.id] || 0;
     const isBeverage =
       item.categoryId === 'hot-beverages' || item.categoryId === 'cold-beverages';
@@ -240,8 +242,12 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
         key={item.id}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.02, duration: 0.25, ease: [0.19, 1, 0.22, 1] }}
-        className={`shrink-0 w-[190px] sm:w-[210px] h-[155px] snap-start rounded-[22px] sm:rounded-[26px] bg-[#0A0B10]/80 border backdrop-blur-md p-4 flex flex-col justify-between group transition-all relative overflow-hidden ${
+        transition={{ delay: Math.min(index * 0.015, 0.2), duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
+        className={`${
+          gridMode
+            ? 'w-full min-h-[140px]'
+            : 'shrink-0 w-[190px] sm:w-[210px] h-[155px] snap-start'
+        } rounded-[22px] sm:rounded-[26px] bg-[#0A0B10]/80 border backdrop-blur-md p-4 flex flex-col justify-between group transition-all relative overflow-hidden ${
           qty > 0 ? 'border-[#22C55E]/50 bg-[#0C120E]/90' : 'border-white/8 hover:border-white/20'
         }`}
       >
@@ -360,40 +366,53 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
             </button>
           )
         ) : (
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 pl-6 sm:pl-0">
-            <button
-              type="button"
-              onClick={() => setFilter('all')}
-              className={`shrink-0 min-h-[34px] px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                filter === 'all'
-                  ? 'bg-white text-black font-semibold'
-                  : 'bg-white/6 text-white/60 hover:text-white border border-white/8'
-              }`}
-            >
-              All ({activeItems.length})
-            </button>
-            {MENU_CATEGORIES.map((cat) => {
-              const count = activeItems.filter((i) => i.categoryId === cat.id).length;
-              return (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => setFilter(cat.id)}
-                  className={`shrink-0 min-h-[34px] px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                    filter === cat.id
-                      ? 'bg-white text-black font-semibold'
-                      : 'bg-white/6 text-white/60 hover:text-white border border-white/8'
-                  }`}
-                >
-                  {cat.shortLabel} ({count})
-                </button>
-              );
-            })}
+          <div className="space-y-3 w-full">
+            <div className="relative max-w-md">
+              <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-3 pointer-events-none" />
+              <input
+                type="search"
+                value={menuSearch}
+                onChange={(e) => setMenuSearch(e.target.value)}
+                placeholder="Search coffee, dosa, pasta, soup..."
+                className="w-full h-10 pl-10 pr-4 rounded-full bg-white/6 border border-white/12 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-[#D8FF48]"
+              />
+            </div>
+
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+              <button
+                type="button"
+                onClick={() => setFilter('all')}
+                className={`shrink-0 min-h-[34px] px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  filter === 'all'
+                    ? 'bg-white text-black font-semibold'
+                    : 'bg-white/6 text-white/60 hover:text-white border border-white/8'
+                }`}
+              >
+                All ({activeItems.length})
+              </button>
+              {MENU_CATEGORIES.map((cat) => {
+                const count = activeItems.filter((i) => i.categoryId === cat.id).length;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setFilter(cat.id)}
+                    className={`shrink-0 min-h-[34px] px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                      filter === cat.id
+                        ? 'bg-white text-black font-semibold'
+                        : 'bg-white/6 text-white/60 hover:text-white border border-white/8'
+                    }`}
+                  >
+                    {cat.shortLabel} ({count})
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
 
-      {/* Compact Home View (1 Snacks row + 1 Beverages row) OR Full 8-Category Menu */}
+      {/* Compact Home View (1 Snacks row + 1 Beverages row) OR Full 8-Category Menu Grid */}
       {compact ? (
         <>
           <div className="space-y-2 pt-1">
@@ -422,16 +441,26 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
         </>
       ) : (
         MENU_CATEGORIES.filter((cat) => filter === 'all' || filter === cat.id).map((cat) => {
-          const items = activeItems.filter((i) => i.categoryId === cat.id);
+          const q = menuSearch.trim().toLowerCase();
+          const items = activeItems.filter((i) => {
+            if (i.categoryId !== cat.id) return false;
+            if (!q) return true;
+            return (
+              i.name.toLowerCase().includes(q) ||
+              i.category.toLowerCase().includes(q) ||
+              (i.badge && i.badge.toLowerCase().includes(q))
+            );
+          });
+          if (items.length === 0) return null;
           return (
-            <div key={cat.id} className="space-y-2 pt-1">
-              <div className="flex items-center justify-between px-1">
-                <span className="text-xs font-semibold text-white/80">{cat.label}</span>
-                <span className="text-[11px] text-white/40">{items.length} Items</span>
+            <div key={cat.id} className="space-y-3 pt-2">
+              <div className="flex items-center justify-between px-1 border-b border-white/8 pb-2">
+                <span className="text-sm font-bold text-white">{cat.label}</span>
+                <span className="text-[11px] text-white/45 font-mono">{items.length} Items</span>
               </div>
 
-              <div className="flex gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory">
-                {items.map((item, index) => renderCard(item, index))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {items.map((item, index) => renderCard(item, index, true))}
               </div>
             </div>
           );
