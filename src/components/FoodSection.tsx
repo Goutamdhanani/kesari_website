@@ -1,4 +1,4 @@
-import React, { useState, useId } from 'react';
+import React, { useState, useId, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   UtensilsCrossed,
@@ -61,15 +61,48 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [seatingLocation, setSeatingLocation] = useState(initialSeatingLocation);
-  const [pickupDate, setPickupDate] = useState('');
-  const [pickupTime, setPickupTime] = useState('');
+  const [slotMode, setSlotMode] = useState<'slot' | 'event'>('slot');
+  const [dateChoice, setDateChoice] = useState<'today' | 'tomorrow' | 'other'>('today');
+  const [otherDate, setOtherDate] = useState('');
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('ASAP');
   const [selectedEventId, setSelectedEventId] = useState<string>('');
   const [customEventName, setCustomEventName] = useState('');
+  const [showOptionalDetails, setShowOptionalDetails] = useState(false);
   const [specialNote, setSpecialNote] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [orderSent, setOrderSent] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const orderSectionId = useId();
+
+  // Café operating hours: 10:00 AM – 11:30 PM daily (30-min slots)
+  const availableTimeSlots = useMemo(() => {
+    const slots: string[] = [];
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+    for (let mins = 10 * 60; mins <= 23 * 60 + 30; mins += 30) {
+      if (dateChoice === 'today' && mins <= nowMinutes + 15) continue;
+      const h24 = Math.floor(mins / 60);
+      const m = mins % 60;
+      const period = h24 >= 12 ? 'PM' : 'AM';
+      const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+      slots.push(`${h12}:${String(m).padStart(2, '0')} ${period}`);
+    }
+    return slots;
+  }, [dateChoice]);
+
+  const formattedDateLabel = useMemo(() => {
+    const base = new Date();
+    if (dateChoice === 'tomorrow') base.setDate(base.getDate() + 1);
+    if (dateChoice === 'other' && otherDate) {
+      const parsed = new Date(`${otherDate}T00:00:00`);
+      if (!Number.isNaN(parsed.getTime())) {
+        return parsed.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+      }
+      return otherDate;
+    }
+    return base.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  }, [dateChoice, otherDate]);
 
   const updateQuantity = (id: string, delta: number) => {
     setCart((prev) => {
@@ -114,15 +147,25 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
           ? `${pickedEvent.title} (${pickedEvent.dateLabel} · ${pickedEvent.timeLabel})`
           : customEventName.trim();
 
+    const slotText =
+      slotMode === 'event'
+        ? resolvedEvent
+          ? `*Event Slot:* ${resolvedEvent}`
+          : '*Slot:* At an Event'
+        : `*Slot:* ${
+            dateChoice === 'today'
+              ? `Today (${formattedDateLabel})`
+              : dateChoice === 'tomorrow'
+                ? `Tomorrow (${formattedDateLabel})`
+                : formattedDateLabel
+          } · ${selectedTimeSlot}`;
+
     return [
-      `*KESARI CAFE PICKUP / ORDER*`,
+      `*KESARI CAFE ORDER*`,
+      slotText,
       customerName.trim() ? `*Name:* ${customerName.trim()}` : null,
       customerPhone.trim() ? `*Phone:* ${customerPhone.trim()}` : null,
       seatingLocation.trim() ? `*Table / Seating:* ${seatingLocation.trim()}` : null,
-      pickupDate.trim() || pickupTime.trim()
-        ? `*Pickup Date & Time:* ${[pickupDate.trim(), pickupTime.trim()].filter(Boolean).join(' · ')}`
-        : null,
-      resolvedEvent ? `*Event:* ${resolvedEvent}` : null,
       `---------------------------------`,
       itemsListText,
       `---------------------------------`,
@@ -484,134 +527,230 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
               </span>
             </div>
 
-            {/* Customer Details Form for WhatsApp message */}
-            <form onSubmit={handleSendWhatsAppOrder} className="space-y-3 pt-1">
-              {/* Simple 2-Column Pickup Schedule: Date & Time + Event */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-medium text-white/70 flex items-center gap-1.5">
-                    <Calendar size={12} className="text-[#D8FF48]" />
-                    <span>Pickup Date &amp; Time (Optional)</span>
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="date"
-                      value={pickupDate}
-                      onChange={(e) => setPickupDate(e.target.value)}
-                      className="w-full bg-white/5 border border-white/12 rounded-xl px-2.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#22C55E] transition-colors"
-                    />
-                    <div className="relative">
-                      <Clock size={12} className="text-white/40 absolute left-2.5 top-3 pointer-events-none" />
+            {/* Tap-to-Select Slot / Event Scheduler */}
+            <form onSubmit={handleSendWhatsAppOrder} className="space-y-4 pt-1">
+              <div className="space-y-2.5">
+                <span className="text-xs font-semibold text-white/80 flex items-center gap-1.5">
+                  <Calendar size={13} className="text-[#D8FF48]" />
+                  <span>Schedule Slot</span>
+                </span>
+
+                {/* 2-Tab Mode Switcher: Select Slot vs At an Event */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSlotMode('slot')}
+                    className={`h-10 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                      slotMode === 'slot'
+                        ? 'bg-[#D8FF48] text-[#07070A] border-[#D8FF48]'
+                        : 'bg-white/[0.04] text-white/75 border-white/10 hover:border-white/25'
+                    }`}
+                  >
+                    <Clock size={13} />
+                    <span>Select Slot</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSlotMode('event')}
+                    className={`h-10 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                      slotMode === 'event'
+                        ? 'bg-[#D8FF48] text-[#07070A] border-[#D8FF48]'
+                        : 'bg-white/[0.04] text-white/75 border-white/10 hover:border-white/25'
+                    }`}
+                  >
+                    <Ticket size={13} />
+                    <span>At an Event</span>
+                  </button>
+                </div>
+
+                {slotMode === 'slot' ? (
+                  <div className="space-y-2.5">
+                    {/* Quick Date Pills */}
+                    <div className="flex flex-wrap gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDateChoice('today');
+                          setSelectedTimeSlot('ASAP');
+                        }}
+                        className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                          dateChoice === 'today'
+                            ? 'bg-[#D8FF48] text-[#07070A] border-[#D8FF48]'
+                            : 'bg-white/[0.04] text-white/75 border-white/10 hover:border-white/25'
+                        }`}
+                      >
+                        Today, {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDateChoice('tomorrow');
+                          if (selectedTimeSlot === 'ASAP') setSelectedTimeSlot('7:00 PM');
+                        }}
+                        className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                          dateChoice === 'tomorrow'
+                            ? 'bg-[#D8FF48] text-[#07070A] border-[#D8FF48]'
+                            : 'bg-white/[0.04] text-white/75 border-white/10 hover:border-white/25'
+                        }`}
+                      >
+                        Tomorrow
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDateChoice('other');
+                          if (selectedTimeSlot === 'ASAP') setSelectedTimeSlot('7:00 PM');
+                        }}
+                        className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                          dateChoice === 'other'
+                            ? 'bg-[#D8FF48] text-[#07070A] border-[#D8FF48]'
+                            : 'bg-white/[0.04] text-white/75 border-white/10 hover:border-white/25'
+                        }`}
+                      >
+                        Other date
+                      </button>
+                    </div>
+
+                    {/* Compact Calendar only when "Other date" is chosen */}
+                    {dateChoice === 'other' && (
                       <input
-                        type="time"
-                        value={pickupTime}
-                        onChange={(e) => setPickupTime(e.target.value)}
-                        className="w-full bg-white/5 border border-white/12 rounded-xl pl-7 pr-2 py-2.5 text-xs text-white focus:outline-none focus:border-[#22C55E] transition-colors"
+                        type="date"
+                        value={otherDate}
+                        onChange={(e) => setOtherDate(e.target.value)}
+                        className="w-full h-10 bg-white/[0.04] border border-white/15 rounded-xl px-3 text-xs text-white focus:outline-none focus:border-[#D8FF48]"
                       />
+                    )}
+
+                    {/* Time Slot Pills from Café Operating Hours (10:00 AM – 11:30 PM) */}
+                    <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                      {dateChoice === 'today' && (
+                        <button
+                          type="button"
+                          onClick={() => setSelectedTimeSlot('ASAP')}
+                          className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
+                            selectedTimeSlot === 'ASAP'
+                              ? 'bg-[#D8FF48] text-[#07070A] border-[#D8FF48]'
+                              : 'bg-white/[0.04] text-white/75 border-white/10 hover:border-white/25'
+                          }`}
+                        >
+                          ASAP
+                        </button>
+                      )}
+                      {availableTimeSlots.map((slot) => (
+                        <button
+                          key={slot}
+                          type="button"
+                          onClick={() => setSelectedTimeSlot(slot)}
+                          className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                            selectedTimeSlot === slot
+                              ? 'bg-[#D8FF48] text-[#07070A] border-[#D8FF48]'
+                              : 'bg-white/[0.04] text-white/75 border-white/10 hover:border-white/25'
+                          }`}
+                        >
+                          {slot}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="space-y-2">
+                    {events.length > 0 ? (
+                      <>
+                        <div className="flex flex-wrap gap-1.5">
+                          {events.map((ev) => {
+                            const active = selectedEventId === ev.id;
+                            return (
+                              <button
+                                key={ev.id}
+                                type="button"
+                                onClick={() => setSelectedEventId(ev.id)}
+                                className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                                  active
+                                    ? 'bg-[#D8FF48] text-[#07070A] border-[#D8FF48]'
+                                    : 'bg-white/[0.04] text-white/75 border-white/10 hover:border-white/25'
+                                }`}
+                              >
+                                {ev.title} · {ev.dateLabel}
+                              </button>
+                            );
+                          })}
+                          <button
+                            type="button"
+                            onClick={() => setSelectedEventId('__custom__')}
+                            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                              selectedEventId === '__custom__'
+                                ? 'bg-[#D8FF48] text-[#07070A] border-[#D8FF48]'
+                                : 'bg-white/[0.04] text-white/75 border-white/10 hover:border-white/25'
+                            }`}
+                          >
+                            Other Event
+                          </button>
+                        </div>
+                        {selectedEventId === '__custom__' && (
+                          <input
+                            type="text"
+                            placeholder="Enter event name"
+                            value={customEventName}
+                            onChange={(e) => setCustomEventName(e.target.value)}
+                            className="w-full h-10 bg-white/[0.04] border border-white/15 rounded-xl px-3.5 text-xs text-white placeholder:text-white/35 focus:outline-none focus:border-[#D8FF48]"
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <input
+                        type="text"
+                        placeholder="Enter event name (optional)"
+                        value={customEventName}
+                        onChange={(e) => setCustomEventName(e.target.value)}
+                        className="w-full h-10 bg-white/[0.04] border border-white/15 rounded-xl px-3.5 text-xs text-white placeholder:text-white/35 focus:outline-none focus:border-[#D8FF48]"
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
 
-                <div className="space-y-1">
-                  <label className="text-[11px] font-medium text-white/70 flex items-center gap-1.5">
-                    <Ticket size={12} className="text-[#D8FF48]" />
-                    <span>Event (Choose or Type)</span>
-                  </label>
-                  {events.length > 0 ? (
-                    <div className="space-y-2">
-                      <select
-                        value={selectedEventId}
-                        onChange={(e) => setSelectedEventId(e.target.value)}
-                        className="w-full bg-[#12151C] border border-white/12 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#22C55E] transition-colors"
-                      >
-                        <option value="">Casual Visit / Pickup Now</option>
-                        {events.map((ev) => (
-                          <option key={ev.id} value={ev.id}>
-                            {ev.title} ({ev.dateLabel} · {ev.timeLabel})
-                          </option>
-                        ))}
-                        <option value="__custom__">Other Event (Enter name)</option>
-                      </select>
-                      {selectedEventId === '__custom__' && (
-                        <input
-                          type="text"
-                          placeholder="Enter event name"
-                          value={customEventName}
-                          onChange={(e) => setCustomEventName(e.target.value)}
-                          className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-[#22C55E]"
-                        />
-                      )}
-                    </div>
-                  ) : (
+              {/* Collapsible Optional Details (Name, Table, Note) */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setShowOptionalDetails((v) => !v)}
+                  className="text-[11px] font-medium text-white/50 hover:text-white/80 transition-colors"
+                >
+                  {showOptionalDetails ? '− Hide name / table / note' : '+ Add name, table or note (optional)'}
+                </button>
+
+                {showOptionalDetails && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-2.5">
                     <input
                       type="text"
-                      placeholder="Event name or Casual Pickup"
-                      value={customEventName}
-                      onChange={(e) => setCustomEventName(e.target.value)}
-                      className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#22C55E] transition-colors"
+                      placeholder="Your name (optional)"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      className="w-full h-10 bg-white/[0.04] border border-white/12 rounded-xl px-3 text-xs text-white placeholder:text-white/35 focus:outline-none focus:border-[#D8FF48]"
                     />
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-medium text-white/70 flex items-center gap-1.5">
-                    <User size={12} className="text-white/40" />
-                    <span>Your Name (Optional)</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter your name"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#22C55E] transition-colors"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[11px] font-medium text-white/70 flex items-center gap-1.5">
-                    <Phone size={12} className="text-white/40" />
-                    <span>Phone Number (Optional)</span>
-                  </label>
-                  <input
-                    type="tel"
-                    placeholder="10-digit mobile number"
-                    value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
-                    className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#22C55E] transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-medium text-white/70 flex items-center gap-1.5">
-                    <MapPin size={12} className="text-white/40" />
-                    <span>Table / Seating Location (Optional)</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Table 3, Main Hall, Lounge"
-                    value={seatingLocation}
-                    onChange={(e) => setSeatingLocation(e.target.value)}
-                    className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#22C55E] transition-colors"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[11px] font-medium text-white/70 flex items-center gap-1.5">
-                    <MessageSquare size={12} className="text-white/40" />
-                    <span>Special Instructions (Optional)</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Less spicy, hot coffee"
-                    value={specialNote}
-                    onChange={(e) => setSpecialNote(e.target.value)}
-                    className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#22C55E] transition-colors"
-                  />
-                </div>
+                    <input
+                      type="text"
+                      placeholder="Table / Seating (optional)"
+                      value={seatingLocation}
+                      onChange={(e) => setSeatingLocation(e.target.value)}
+                      className="w-full h-10 bg-white/[0.04] border border-white/12 rounded-xl px-3 text-xs text-white placeholder:text-white/35 focus:outline-none focus:border-[#D8FF48]"
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Phone (optional)"
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(e.target.value)}
+                      className="w-full h-10 bg-white/[0.04] border border-white/12 rounded-xl px-3 text-xs text-white placeholder:text-white/35 focus:outline-none focus:border-[#D8FF48]"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Special note (optional)"
+                      value={specialNote}
+                      onChange={(e) => setSpecialNote(e.target.value)}
+                      className="w-full h-10 bg-white/[0.04] border border-white/12 rounded-xl px-3 text-xs text-white placeholder:text-white/35 focus:outline-none focus:border-[#D8FF48]"
+                    />
+                  </div>
+                )}
               </div>
 
               {formError && (
@@ -669,7 +808,7 @@ export const FoodSection: React.FC<FoodSectionProps> = ({
               className="shrink-0 h-10 px-4 rounded-xl bg-[#D8FF48] hover:bg-[#C8EE38] text-[#07070A] text-xs font-bold inline-flex items-center gap-1.5 transition-colors"
             >
               <Receipt className="w-3.5 h-3.5" />
-              <span>Pickup &amp; Send</span>
+              <span>Select Slot &amp; Send</span>
             </button>
           </motion.div>
         )}
